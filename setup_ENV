@@ -1,0 +1,24 @@
+#! /bin/bash
+
+export PROJECT_DIR=$(dirname $(/bin/readlink -f $BASH_SOURCE))
+printf "\nPROJECT_DIR (base de l'arborescence du projet) = \n%s\n\n" "$PROJECT_DIR"
+
+source /softslin/configCAO/Synopsys/licence_synopsys
+source /softslin/configCAO/Synopsys/config_DesignVision
+
+source /softslin/configCAO/Cadence/licence_cadence
+source /softslin/configCAO/Cadence/config_Virtuoso
+source /softslin/configCAO/Cadence/cWAVE_FILE = simulation.wlfonfig_Innovus_17
+source /softslin/configCAO/Cadence/config_QRC
+
+source /softslin/configCAO/MentorGraphics/config_Calibre
+source /softslin/configCAO/MentorGraphics/licence_mentor_graphics
+
+source /softslin/configCAO/Xilinx/config_ISE
+source /softslin/configCAO/AMS/config_AMS_ISR
+
+source /softslin/configCAO/MentorGraphics/config_Questa107c
+
+source /softslin/configCAO/Atrenta/config_Spyglass
+
+export MODELSIM="${PROJECT_DIR}/config/modelsim.ini"

@@ -1,0 +1,17 @@
+# QuestaSim simulation files
+*.do
+*.mti
+*.bak
+*.wlf
+*.log
+*.key
+*.rc
+*.so
+*.dll
+*.tgz
+*.zip
+*.exe
+*.out
+*.vcd
+*.shm
+
