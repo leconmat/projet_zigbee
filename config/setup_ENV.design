@@ -4,3 +4,4 @@
 export PROJECT_LIBS_DIR=$(PROJECT_DIR)/libs
 
 # Modules directories
+export FIFO_TX_DIR=$(PROJECT_DIR)/modules/fifo_tx
