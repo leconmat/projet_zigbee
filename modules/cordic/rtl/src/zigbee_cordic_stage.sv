@@ -25,7 +25,7 @@ module zigbee_cordic_stage
 			Yout <= Yin - Xin_shifted;
 			Wout <= Win + CONST_TAN;
 		end
-		else 				// If Yin is negative
+		else 	// If Yin is negative
 		begin
 			Xout <= Xin - Yin_shifted;
 			Yout <= Yin + Xin_shifted;

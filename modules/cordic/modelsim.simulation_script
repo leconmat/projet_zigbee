@@ -11,6 +11,8 @@ if [[ ! -d ${MODULE_LIBS_FOLDER} ]]; then
 	mkdir -p "${MODULE_LIBS_FOLDER}lib_BENCH"
 fi
 
+rm -r ${MODULE_LIBS_FOLDER}lib_RTL/* ${MODULE_LIBS_FOLDER}lib_BENCH/*
+
 vlib ${MODULE_LIBS_FOLDER}lib_RTL/libCORDIC
 vlib ${MODULE_LIBS_FOLDER}lib_BENCH/libCORDICTB
 
@@ -19,4 +21,6 @@ vmap libCORDICTB ${MODULE_LIBS_FOLDER}lib_BENCH/libCORDICTB
 
 vlog +acc -sv -l simulation.log -work libCORDICTB -L libCORDIC ${MODULE_RTL_FOLDER}src/*.sv ${MODULE_BENCH_FOLDER}src/*.sv
 
-vsim -debugDB -lib libCORDICTB -L libCORDIC zigbee_cordic_tb -do "add wave angleRad Wout angleDeg WoutDeg deltaError IbbReal QbbReal Ibb Qbb" -do "run 1us"
+# vsim -debugDB -lib libCORDICTB -L libCORDIC zigbee_cordic_tb -do "add wave angleRad Wout angleDeg WoutDeg deltaError IbbReal QbbReal Ibb Qbb maxError" -do "run 100us"
+
+vsim -debugDB -lib libCORDICTB -L libCORDIC zigbee_cordic_tb -do "add wave deltaError maxError" -do "run 20us"
