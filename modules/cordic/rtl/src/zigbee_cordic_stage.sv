@@ -1,35 +1,53 @@
-module zigbee_cordic_stage 
+//////////////////////////////////////////////////////////////////////////////////////////////
+// File: zigbee_cordic_stage.sv
+// Authors: Nathan Hocquette
+//          Romain Plumaugat
+// Description: Rotate the vector of coordinates xin & yin with an angle of CONST_TAN
+//              Give the new coordinates xout & yout with the new angle value wout
+//////////////////////////////////////////////////////////////////////////////////////////////
+module zigbee_cordic_stage_comb 
 	#(parameter integer NUM_STAGE, XY_SIZE, W_SIZE,
 	  parameter [W_SIZE-1:0] CONST_TAN) (
+	// Inputs
+	xin,
+	yin,
+	win,
 
-	Xin, Yin, Win,
-	Xout, Yout, Wout
+	// Outputs
+	xout,
+	yout,
+	wout
 	);
 
-	input logic signed [XY_SIZE-1:0] Xin, Yin;
-	input logic signed [W_SIZE-1:0] Win;
 
-	output logic signed [XY_SIZE-1:0] Xout, Yout;
-	output logic signed [W_SIZE-1:0] Wout;
 
-	logic signed [XY_SIZE-1:0] Xin_shifted, Yin_shifted;
+	//////////////////////////////////////////////////////////////////////////////////////////////
+	// IOs declarations
+	//////////////////////////////////////////////////////////////////////////////////////////////
+	input wire signed [XY_SIZE-1:0] xin, yin; // Starting vector coordinates
+	input wire signed [W_SIZE-1:0] win; // Starting phase
 
-	assign Xin_shifted = Xin >>> NUM_STAGE;
-	assign Yin_shifted = Yin >>> NUM_STAGE;
+	output wire signed [XY_SIZE-1:0] xout, yout; // New vector coordinates
+	output wire signed [W_SIZE-1:0] wout; // New phase, rotate from CONST_TAN
 
-	always_comb
-	begin
-		if (!Yin[XY_SIZE-1]) // If Yin is positive
-		begin
-			Xout <= Xin + Yin_shifted;
-			Yout <= Yin - Xin_shifted;
-			Wout <= Win + CONST_TAN;
-		end
-		else 	// If Yin is negative
-		begin
-			Xout <= Xin - Yin_shifted;
-			Yout <= Yin + Xin_shifted;
-			Wout <= Win - CONST_TAN;
-		end
-	end
+	wire signed [XY_SIZE-1:0] xin_shifted, yin_shifted; // xin/2 & yin/2
+
+
+
+	//////////////////////////////////////////////////////////////////////////////////////////////
+	// Wiring of the CORDIC STAGE
+	//////////////////////////////////////////////////////////////////////////////////////////////
+	// Signed right shift
+	assign xin_shifted = xin >>> NUM_STAGE;
+	assign yin_shifted = yin >>> NUM_STAGE;
+
+	// If yin is positive
+	assign xout = !yin[XY_SIZE-1] ? xin + yin_shifted :
+									xin - yin_shifted;
+
+	assign yout = !yin[XY_SIZE-1] ? yin - xin_shifted :
+									yin + xin_shifted;
+
+	assign wout = !yin[XY_SIZE-1] ? win + CONST_TAN :
+									win - CONST_TAN;
 endmodule

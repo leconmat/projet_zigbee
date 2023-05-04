@@ -1,4 +1,7 @@
-`timescale 1ns/10ps
+// File: zigbee_cordic_bench.sv
+// Authors: Nathan Hocquette
+//          Romain Plumaugat
+// Description: Testbench for the cordic module
 
 module zigbee_cordic_tb;
 
@@ -10,47 +13,53 @@ module zigbee_cordic_tb;
 	real errors[$];
 	real maxError;
 
-	logic Clk;
-	initial begin
-		Clk = 0;
-		forever #(100 / 2) Clk = !Clk;
-	end
-
 	// Inputs
-	logic signed [IQ_SIZE-1:0] Ibb, Qbb;
-	real IbbReal, QbbReal, angleRad, angleDeg, deltaError, WoutDeg;
-	
-	// Output
-	logic signed [W_SIZE-1:0] Wout;
+	logic signed [IQ_SIZE-1:0] ibb, qbb;
+	logic clk, reset_n;
+	real ibbReal, qbbReal, angleRad, angleDeg, deltaError, woutDeg;
 
-	// DUT
-	zigbee_cordic_top CORDIC (.Ibb(Ibb), .Qbb(Qbb), .Wout(Wout), .Clk(Clk));
+	// Output
+	logic signed [W_SIZE-1:0] wout;
+
+	// DUT instantiation
+	zigbee_cordic_top CORDIC (.clk(clk), .reset_n(reset_n), // Clock and reset
+							  .ibb(ibb), .qbb(qbb), // Inputs
+							  .wout(wout)); // Outputs
 	
 	// DUT input stimuli
-	assign IbbReal = $cos(angleRad) * AMPLITUDE;
-	assign QbbReal = $sin(angleRad) * AMPLITUDE;
-	
-	assign Ibb = int'(IbbReal);
-	assign Qbb = int'(QbbReal);
+	assign ibbReal = $cos(angleRad) * AMPLITUDE;
+	assign qbbReal = $sin(angleRad) * AMPLITUDE;
+	assign ibb = int'(ibbReal);
+	assign qbb = int'(qbbReal);
+
+
 
 	// DUT output result
-	assign WoutDeg = $itor(Wout) * 5.625;
+	assign woutDeg = $itor(wout) * 5.625;
 	
 	// DUT output unwrapper
 	always_comb begin
-		deltaError = WoutDeg - angleDeg;
+		deltaError = woutDeg - angleDeg;
 		if (deltaError > 180)
 			deltaError -= 360;
 		if (deltaError <= -180)
 			deltaError += 360;
 	end
+
+	// Initialize the clock at 50MHz
+	initial begin
+		clk = 0;
+		forever #20ns clk = !clk;
+	end
 	
 	// DUT random stimuli angle generator
 	initial begin
+		reset_n = 1'b0;
+		#750ns reset_n = 1'b1;
 		forever begin
 			angleRad = $itor($urandom_range(2 * PI * 10000)) / 10000;
 			angleDeg = (angleRad * 360) / (2 * PI);
-			#200;
+			#200ns;
 			errors.push_back(deltaError);
 
 			if((deltaError > 0 ? deltaError : -deltaError) > maxError)
