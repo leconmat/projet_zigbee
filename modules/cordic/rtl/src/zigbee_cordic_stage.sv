@@ -6,8 +6,9 @@
 //              Give the new coordinates xout & yout with the new angle value wout
 //////////////////////////////////////////////////////////////////////////////////////////////
 module zigbee_cordic_stage_comb 
-	#(parameter integer NUM_STAGE, XY_SIZE, W_SIZE,
-	  parameter [W_SIZE-1:0] CONST_TAN) (
+	#(parameter integer NUM_STAGE = 1, XY_SIZE = 1, W_SIZE = 0,
+	  parameter [W_SIZE-1:0] CONST_TAN = 4) 
+        (
 	// Inputs
 	xin,
 	yin,

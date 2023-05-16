@@ -37,9 +37,26 @@ module zigbee_cordic_top (
 
 	// Cordic stages wires
 	// 1 wires stage more than number of cordic stages
-	wire [IQ_SIZE+1-1:0] cor_x [NUM_STAGES-1+1:0];
-	wire [IQ_SIZE+1-1:0] cor_y [NUM_STAGES-1+1:0];
-	wire [W_SIZE-1:0] cor_w [NUM_STAGES-1+1:0];
+	reg [IQ_SIZE+1-1:0] cor_x_s0 [2-1+1:0];
+	reg [IQ_SIZE+1-1:0] cor_y_s0 [2-1+1:0];
+	reg [W_SIZE-1:0] cor_w_s0 [2-1+1:0];
+	
+	reg [IQ_SIZE+1-1:0] cor_x_s1 [NUM_STAGES-1+1:2];
+	reg [IQ_SIZE+1-1:0] cor_y_s1 [NUM_STAGES-1+1:2];
+	reg [W_SIZE-1:0] cor_w_s1 [NUM_STAGES-1+1:2];
+
+	always @(posedge clk, negedge reset_n) begin
+		if(!reset_n) begin
+			cor_x_s1[2] <= 0;
+			cor_y_s1[2] <= 0;
+			cor_w_s1[2] <= 0;
+		end
+		else begin
+			cor_x_s1[2] <= cor_x_s0[2];
+			cor_y_s1[2] <= cor_y_s0[2];
+			cor_w_s1[2] <= cor_w_s0[2];
+		end
+	end
 
 
 
@@ -47,13 +64,13 @@ module zigbee_cordic_top (
 	// Wiring of the CORDIC TOP
 	//////////////////////////////////////////////////////////////////////////////////////////////
 	// Stage input assignation, function of the sign of ibb
-	assign cor_y[0] = ibb_ibuff[IQ_SIZE-1] ? {!qbb_ibuff[IQ_SIZE-1], -qbb_ibuff} :
+	assign cor_y_s0[0] = ibb_ibuff[IQ_SIZE-1] ? {!qbb_ibuff[IQ_SIZE-1], -qbb_ibuff} :
 											 {qbb_ibuff[IQ_SIZE-1], qbb_ibuff};
 
-	assign cor_x[0] = ibb_ibuff[IQ_SIZE-1] ? {1'b0, -ibb_ibuff}:
+	assign cor_x_s0[0] = ibb_ibuff[IQ_SIZE-1] ? {1'b0, -ibb_ibuff}:
 											 {1'b0, ibb_ibuff};
 
-	assign cor_w[0] = ibb_ibuff[IQ_SIZE-1] ? {1'b1, {W_SIZE-1{1'b0}}}: // 180 degree
+	assign cor_w_s0[0] = ibb_ibuff[IQ_SIZE-1] ? {1'b1, {W_SIZE-1{1'b0}}}: // 180 degree
 											 {W_SIZE{1'b0}};
 
 
@@ -63,19 +80,35 @@ module zigbee_cordic_top (
 	//////////////////////////////////////////////////////////////////////////////////////////////
 	genvar iStage;
 	generate
-		for (iStage = 0; iStage < NUM_STAGES; iStage = iStage+1) begin : zigbee_cordic_stage_gen
+		for (iStage = 0; iStage < 2; iStage = iStage + 1) begin : zigbee_cordic_stage_gen_s0
 			zigbee_cordic_stage_comb #(
 				.NUM_STAGE(iStage),
 				.XY_SIZE(IQ_SIZE + 1),
 				.W_SIZE(W_SIZE),
 				.CONST_TAN(1 << (NUM_STAGES - iStage - 1))
 				) stage (
-				.xin(cor_x[iStage]),
-				.yin(cor_y[iStage]),
-				.win(cor_w[iStage]),
-				.xout(cor_x[iStage + 1]),
-				.yout(cor_y[iStage + 1]),
-				.wout(cor_w[iStage + 1])
+				.xin(cor_x_s0[iStage]),
+				.yin(cor_y_s0[iStage]),
+				.win(cor_w_s0[iStage]),
+				.xout(cor_x_s0[iStage + 1]),
+				.yout(cor_y_s0[iStage + 1]),
+				.wout(cor_w_s0[iStage + 1])
+				);
+		end
+
+		for (iStage = 2; iStage < NUM_STAGES; iStage = iStage + 1) begin : zigbee_cordic_stage_gen_s1
+			zigbee_cordic_stage_comb #(
+				.NUM_STAGE(iStage),
+				.XY_SIZE(IQ_SIZE + 1),
+				.W_SIZE(W_SIZE),
+				.CONST_TAN(1 << (NUM_STAGES - iStage - 1))
+				) stage (
+				.xin(cor_x_s1[iStage]),
+				.yin(cor_y_s1[iStage]),
+				.win(cor_w_s1[iStage]),
+				.xout(cor_x_s1[iStage + 1]),
+				.yout(cor_y_s1[iStage + 1]),
+				.wout(cor_w_s1[iStage + 1])
 				);
 		end
 	endgenerate
@@ -95,7 +128,7 @@ module zigbee_cordic_top (
 		else begin
 			ibb_ibuff <= ibb;
 			qbb_ibuff <= qbb;
-			wout_obuff <= cor_w[NUM_STAGES];
+			wout_obuff <= cor_w_s1[NUM_STAGES];
 		end
 	end
 
