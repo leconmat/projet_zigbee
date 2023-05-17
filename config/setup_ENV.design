@@ -4,3 +4,4 @@
 export PROJECT_LIBS_DIR=$(PROJECT_DIR)/libs
 
 # Modules directories
+export IQ_DEMOD_DIR=$(PROJECT_DIR)/modules/iq_demod
