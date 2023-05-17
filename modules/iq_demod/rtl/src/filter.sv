@@ -17,7 +17,7 @@ logic data_1, data_2, out_factor;
 logic [5:0] mult;
 logic [5:0] sum;
 logic [1:0] sel;
-logic [7:0] shift_reg [4:0];
+logic [4:0] shift_reg [7:0];
 logic validation, pret;
 logic [2:0] indicateur;
 

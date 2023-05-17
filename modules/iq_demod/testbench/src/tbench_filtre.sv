@@ -13,7 +13,7 @@ timeprecision 1ns;
 
 bit clk = 1'b1;
 bit reset;        
-
+bit validation,pret;
 logic [4:0] filter_in; 
 logic [4:0] filter_out;
 
@@ -38,12 +38,18 @@ fsm dut (.clk(clk),
 	 .cosine_out(cosine)
 	);
 
+enable valid (.clk(clk),
+	      .resetn(resetn),
+	      .valid_ADC(validation),
+	      .ready_ADC(pret)
+);
+
 // Monitor Results format
 initial
 begin
 	$timeformat ( -9, 1, " ns", 12 );
-	reset = 1'b1;
-	#60 reset = 1'b0; //reset sur frond descendant
+	reset = 1'b0;
+	#60 reset = 1'b1; //reset à l'etat bas
 end
 
 // Clock and Reset Definition
@@ -54,7 +60,7 @@ end
 
 // Apply Stimulus on filter inputs
 // verify filter behaviour for Dirac and step function (echelon)
-initial                                                                   
+initial                                                                
    	unique case (stimuli_choice)
 		32'h1 : begin //dirac
 				filter_in = 'b0;
@@ -70,8 +76,13 @@ initial
 		32'h3 : //Sinus a freq variable
 		forever 
 			begin
+				
 				for(i = 1; i < 100000; i += 1)
 				begin
+				 #100; 
+				validation = 1; 
+				 #100;
+				 validation = 0;   
 					//freq = freq+0.001;
 					filter_in = sinus;
 					#100;
