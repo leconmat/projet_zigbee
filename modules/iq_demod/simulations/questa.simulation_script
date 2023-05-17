@@ -1,0 +1,63 @@
+#!/bin/bash
+
+# Set IP name
+IPname=$(echo $1 | cut -d'-' -f 3)
+
+echo "#########################################"
+echo "## Run simulation flow for $IPname"
+echo "#########################################"
+
+# Check if ${PROJECT_DIR} is empty
+if [[ -z ${PROJECT_DIR} ]]; then
+	echo "ERROR: You need to source setup_ENV at the root of the project folder"
+	exit 1;
+fi
+
+# Check number of parameters
+if [ $# -ne 1 ]; then
+	echo "ERROR: Illegal number of parameters"
+	echo "./questa.simulation_script --<IPname>"
+	exit 1
+fi
+
+# Check if you are in the right folder
+if [[ ! $PWD == "${PROJECT_DIR}/modules/${IPname}/simulations" ]]; then
+	echo "ERROR: You need to be in the simulation directory of your module (simulations/)"
+	echo "Check if you have specify the correct IP name"
+	exit 1
+fi
+
+# Configure environment variables
+export MODULE_MAIN_FOLDER="../"
+export MODULE_CONFIG_FOLDER="${PROJECT_DIR}config/"
+export MODULE_LIBS_FOLDER="${MODULE_MAIN_FOLDER}libs/"
+export MODULE_RTL_FOLDER="${MODULE_MAIN_FOLDER}rtl/"
+export MODULE_BENCH_FOLDER="${MODULE_MAIN_FOLDER}testbench/"
+
+if [[ ! -d ${MODULE_LIBS_FOLDER} ]]; then
+	mkdir -p "${MODULE_LIBS_FOLDER}lib_RTL"
+	mkdir -p "${MODULE_LIBS_FOLDER}lib_BENCH"
+	mkdir -p "${MODULE_LIBS_FOLDER}lib_SYNTH"
+fi
+
+rm -r ${MODULE_LIBS_FOLDER}lib_RTL/* ${MODULE_LIBS_FOLDER}lib_BENCH/* ${MODULE_LIBS_FOLDER}lib_SYNTH/*
+
+# Creating libraries
+vlib ${MODULE_LIBS_FOLDER}lib_RTL/lib_${IPname}
+vlib ${MODULE_LIBS_FOLDER}lib_BENCH/lib_${IPname}_TB
+vlib ${MODULE_LIBS_FOLDER}lib_SYNTH/lib_${IPname}_SYNTH
+
+# Mapping libraries
+vmap lib_${IPname} ${MODULE_LIBS_FOLDER}lib_RTL/lib_${IPname}
+vmap lib_${IPname}_TB ${MODULE_LIBS_FOLDER}lib_BENCH/lib_${IPname}_TB
+vmap lib_${IPname}_SYNTH ${MODULE_LIBS_FOLDER}lib_SYNTH/lib_${IPname}_SYNTH
+
+# Compile design
+vlog +acc -sv -work lib_${IPname} ${MODULE_RTL_FOLDER}src/*.sv
+# vlog +acc -work libCORDICSYNTH ${MODULE_RTL_FOLDER}synth/*.v
+vlog +acc -sv -work lib_${IPname}_TB ${MODULE_BENCH_FOLDER}src/*.sv -L lib_${IPname}
+
+# Run simulation
+vsim -debugDB -lib lib_${IPname}_TB -L lib_${IPname} tbench_filter
+
+# -L ${AMS_DIR}/verilog/c35b4/lib_Questa107c/c35_CORELIB zigbee_cordic_tb

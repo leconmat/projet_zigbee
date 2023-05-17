@@ -1,4 +1,5 @@
 # QuestaSim simulation files
+*.ini
 *.do
 *.mti
 *.bak
