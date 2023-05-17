@@ -1,5 +1,5 @@
 ####################################
-## This ile contains all attributes about your design
+## This file contains all attributes about your design
 ## You must specify all of them before run the synthesis
 ####################################
 

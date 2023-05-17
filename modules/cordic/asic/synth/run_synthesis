@@ -16,7 +16,7 @@ fi
 # Check if IP was specify in the command
 if [[ $# -ne 1 ]]; then
 	echo "ERROR: Illegal number of parameters"
-	echo "run_synthesis --<IPname>"
+	echo "./run_synthesis --<IPname>"
 	exit 1
 fi
 

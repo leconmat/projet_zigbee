@@ -3,6 +3,8 @@
 //          Romain Plumaugat
 // Description: Testbench for the cordic module
 
+`timescale 1ns/1ps
+
 module zigbee_cordic_tb;
 
 	parameter integer IQ_SIZE = 5;
@@ -10,12 +12,11 @@ module zigbee_cordic_tb;
 	parameter integer AMPLITUDE = 15;
 	parameter real PI = 3.14159265359;
 	
-	real errors[$];
 	real maxError;
 
 	// Inputs
 	logic signed [IQ_SIZE-1:0] ibb, qbb;
-	logic clk, reset_n;
+	logic clk, reset_n, iValid, oValid;
 	real ibbReal, qbbReal, angleRad, angleDeg, deltaError, woutDeg;
 
 	// Output
@@ -23,8 +24,8 @@ module zigbee_cordic_tb;
 
 	// DUT instantiation
 	zigbee_cordic_top CORDIC (.clk(clk), .reset_n(reset_n), // Clock and reset
-							  .ibb(ibb), .qbb(qbb), // Inputs
-							  .wout(wout)); // Outputs
+							  .ibb(ibb), .qbb(qbb), .iValid(iValid), // Inputs
+							  .wout(wout), .oValid(oValid)); // Outputs
 	
 	// DUT input stimuli
 	assign ibbReal = $cos(angleRad) * AMPLITUDE;
@@ -59,8 +60,8 @@ module zigbee_cordic_tb;
 		forever begin
 			angleRad = $itor($urandom_range(2 * PI * 10000)) / 10000;
 			angleDeg = (angleRad * 360) / (2 * PI);
+			iValid <= 1;
 			#200ns;
-			errors.push_back(deltaError);
 
 			if((deltaError > 0 ? deltaError : -deltaError) > maxError)
 				maxError = deltaError > 0 ? deltaError : -deltaError;

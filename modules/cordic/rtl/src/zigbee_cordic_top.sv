@@ -11,9 +11,11 @@ module zigbee_cordic_top (
 	// Inputs
 	ibb,
 	qbb,
+	iValid,
 
 	// Outputs
-	wout
+	wout,
+	oValid
 	);
 
 
@@ -29,11 +31,14 @@ module zigbee_cordic_top (
 	// IOs and Clock declarations
 	input wire signed [IQ_SIZE-1:0] ibb, qbb;
 	output wire signed [W_SIZE-1:0] wout;
-	input wire clk, reset_n;
+	input wire clk, reset_n, iValid;
+	output wire oValid;
 
 	// DFF buffer for IOs
 	reg [IQ_SIZE-1:0] ibb_ibuff, qbb_ibuff;
 	reg [W_SIZE-1:0] wout_obuff;
+	reg iValid_ibuff;
+	reg oValid_obuff;
 
 	// Cordic stages wires
 	// 1 wires stage more than number of cordic stages
@@ -45,16 +50,21 @@ module zigbee_cordic_top (
 	reg [IQ_SIZE+1-1:0] cor_y_s1 [NUM_STAGES-1+1:2];
 	reg [W_SIZE-1:0] cor_w_s1 [NUM_STAGES-1+1:2];
 
+	reg valid_s0 [2-1+1:0];
+	reg valid_s1 [NUM_STAGES-1+1:2];
+
 	always @(posedge clk, negedge reset_n) begin
 		if(!reset_n) begin
 			cor_x_s1[2] <= 0;
 			cor_y_s1[2] <= 0;
 			cor_w_s1[2] <= 0;
+			valid_s1[2] <= 0;
 		end
 		else begin
 			cor_x_s1[2] <= cor_x_s0[2];
 			cor_y_s1[2] <= cor_y_s0[2];
 			cor_w_s1[2] <= cor_w_s0[2];
+			valid_s1[2] <= valid_s0[2];
 		end
 	end
 
@@ -72,6 +82,8 @@ module zigbee_cordic_top (
 
 	assign cor_w_s0[0] = ibb_ibuff[IQ_SIZE-1] ? {1'b1, {W_SIZE-1{1'b0}}}: // 180 degree
 											 {W_SIZE{1'b0}};
+											 
+	assign valid_s0[0] = iValid_ibuff;
 
 
 
@@ -87,12 +99,16 @@ module zigbee_cordic_top (
 				.W_SIZE(W_SIZE),
 				.CONST_TAN(1 << (NUM_STAGES - iStage - 1))
 				) stage (
+				// Inputs
 				.xin(cor_x_s0[iStage]),
 				.yin(cor_y_s0[iStage]),
 				.win(cor_w_s0[iStage]),
+				.validIn(valid_s0[iStage]),
+				// Outputs
 				.xout(cor_x_s0[iStage + 1]),
 				.yout(cor_y_s0[iStage + 1]),
-				.wout(cor_w_s0[iStage + 1])
+				.wout(cor_w_s0[iStage + 1]),
+				.validOut(valid_s0[iStage + 1])
 				);
 		end
 
@@ -103,12 +119,16 @@ module zigbee_cordic_top (
 				.W_SIZE(W_SIZE),
 				.CONST_TAN(1 << (NUM_STAGES - iStage - 1))
 				) stage (
+				// Inputs
 				.xin(cor_x_s1[iStage]),
 				.yin(cor_y_s1[iStage]),
 				.win(cor_w_s1[iStage]),
+				.validIn(valid_s1[iStage]),
+				// Outputs
 				.xout(cor_x_s1[iStage + 1]),
 				.yout(cor_y_s1[iStage + 1]),
-				.wout(cor_w_s1[iStage + 1])
+				.wout(cor_w_s1[iStage + 1]),
+				.validOut(valid_s1[iStage + 1])
 				);
 		end
 	endgenerate
@@ -121,17 +141,22 @@ module zigbee_cordic_top (
 	always @(posedge clk, negedge reset_n)
 	begin
 		if (!reset_n) begin // If reset set all dff at 0
+			iValid_ibuff <= 0;
 			ibb_ibuff <= 0;
 			qbb_ibuff <= 0;
 			wout_obuff <= 0;
+			oValid_obuff <= 0;
 		end
 		else begin
+			iValid_ibuff <= iValid;
 			ibb_ibuff <= ibb;
 			qbb_ibuff <= qbb;
 			wout_obuff <= cor_w_s1[NUM_STAGES];
+			oValid_obuff <= valid_s1[NUM_STAGES];
 		end
 	end
 
 	// Output assignation
 	assign wout = wout_obuff;
+	assign oValid = oValid_obuff;
 endmodule

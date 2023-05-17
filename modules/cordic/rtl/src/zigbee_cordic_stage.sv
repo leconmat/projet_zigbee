@@ -13,11 +13,13 @@ module zigbee_cordic_stage_comb
 	xin,
 	yin,
 	win,
+	validIn,
 
 	// Outputs
 	xout,
 	yout,
-	wout
+	wout,
+	validOut
 	);
 
 
@@ -27,9 +29,11 @@ module zigbee_cordic_stage_comb
 	//////////////////////////////////////////////////////////////////////////////////////////////
 	input wire signed [XY_SIZE-1:0] xin, yin; // Starting vector coordinates
 	input wire signed [W_SIZE-1:0] win; // Starting phase
+	input wire validIn;
 
 	output wire signed [XY_SIZE-1:0] xout, yout; // New vector coordinates
 	output wire signed [W_SIZE-1:0] wout; // New phase, rotate from CONST_TAN
+	output wire validOut;
 
 	wire signed [XY_SIZE-1:0] xin_shifted, yin_shifted; // xin/2 & yin/2
 
@@ -51,4 +55,6 @@ module zigbee_cordic_stage_comb
 
 	assign wout = !yin[XY_SIZE-1] ? win + CONST_TAN :
 									win - CONST_TAN;
+									
+	assign validOut = validIn;
 endmodule
