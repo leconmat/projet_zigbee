@@ -1,9 +1,16 @@
-# Recover design files in the rtl directory
-set files {}
-append files [glob $::env(RTL_FOLDER) {*.sv | *.v | *.vhd}]
-
 # Get all attributes specify in synth_attributes.do
 source synth_attributes.do
+
+set rtlFolder "$::env(PROJECT_DIR)/modules/$::env(IPmodule)/rtl/src/"
+
+if {$vars(is_hierarchical)} {
+	foreach submodule $vars(submodules) {
+		lappend $rtlFolder "$::env(PROJECT_DIR)/modules/$submodule/rtl/src/"
+	}
+}
+
+# Recover design files in the rtl directory
+set files [glob $rtlFolder *.{sv,v,vhd}]
 
 # Read design
 foreach file $files {

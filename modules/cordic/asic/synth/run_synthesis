@@ -1,5 +1,15 @@
 #!/bin/bash
 
+iter=0
+synth_dir="synthesis"
+
+while [[ -d "${synth_dir}_${iter}" ]]; do
+	iter=$((iter+1))
+done
+synth_dir="${synth_dir}_${iter}"
+mkdir ${synth_dir}
+
+(
 # Set IP name
 IPname=$(echo $1 | cut -d'-' -f 3)
 
@@ -33,21 +43,9 @@ if [[ ! -e .synopsys_dc.setup ]]; then
 	exit 1
 fi
 
+export IPmodule=$IPname
 
-export RTL_FOLDER="${PROJECT_DIR}/modules/${IPname}/rtl/src/"
-
-
-iter=0
-synth_dir="synthesis"
-
-while [[ -d "${synth_dir}_${iter}" ]]; do
-	iter=$((iter+1))
-done
-synth_dir="${synth_dir}_${iter}"
-
-mkdir ${synth_dir}
 cp synth_attributes.do ${synth_dir}
 cp .synopsys_dc.setup ${synth_dir}
-cd ${synth_dir}
-
-design_vision -f ../synth_flow.do -no_gui -output_log_file synthesis.log
+cd ${synth_dir} && design_vision -f ../synth_flow.do -no_gui
+) 2>&1 | tee -a "${synth_dir}/synthesis.log"

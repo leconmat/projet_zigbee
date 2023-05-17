@@ -3,6 +3,11 @@
 ## You must specify all of them before run the synthesis
 ####################################
 
+# Only ig the design contains submodules (zigbee_top)
+set vars(is_hierarchical) 0
+set vars(submodules) [list ""]
+
+# Design properties
 set vars(top_level_module) "zigbee_cordic_top"
 set vars(clk_net) "clk"
 set vars(clock_period) 20
