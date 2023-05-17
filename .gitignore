@@ -1,5 +1,4 @@
 # QuestaSim simulation files
-*.do
 *.mti
 *.bak
 *.wlf
@@ -15,3 +14,4 @@
 *.vcd
 *.shm
 /work
+*.ini

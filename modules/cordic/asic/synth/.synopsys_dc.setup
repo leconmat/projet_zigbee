@@ -1,0 +1,30 @@
+# from the System Variable Group 
+
+set link_force_case  "check_reference"
+set link_library  {c35_CORELIB_TYP.db }
+set physical_library ""
+
+set search_path [list . ${synopsys_root}/libraries/syn ${synopsys_root}/dw/sim_ver /softslin/AMS_410_ISR15/synopsys/c35_3.3V]
+set target_library c35_CORELIB_TYP.db
+set synthetic_library  ""
+set command_log_file  "./command.log"
+set designer  ""
+set company  ""
+set find_converts_name_lists  "false"
+set hdlin_work_directory {core} 
+define_design_lib CORE -path ./core
+set symbol_library  c35_CORELIB_TYP.sdb
+
+set test_default_period {100}
+set test_default_delay {0}
+set test_default_bidir_delay {0}
+set test_default_strobe {40}
+set test_stil_netlist_format {verilog}
+
+set hdlin_enable_rtldrc_info {true}
+
+set write_name_nets_same_as_ports {true}
+set write_name_nets_same_as_ports {true}
+set verilogout_no_tri {true}
+set bus_inference_style {%s[%d]}
+set bus_inference_style {%s[%d]}

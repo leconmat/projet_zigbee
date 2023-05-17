@@ -4,3 +4,4 @@
 export PROJECT_LIBS_DIR=$(PROJECT_DIR)/libs
 
 # Modules directories
+export CORDIC_DIR=$(PROJECT_DIR)/modules/cordic
