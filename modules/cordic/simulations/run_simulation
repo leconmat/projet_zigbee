@@ -20,22 +20,33 @@ if [[ -z ${PROJECT_DIR} ]]; then
 fi
 
 # Check number of parameters
-if [ $# -lt 1 ]; then
+if [ $# -lt 1 ] && [ $# -gt 3 ]; then
 	echo "ERROR: Illegal number of parameters"
-	echo "./questa.simulation_script <top_module> (--synthesis)"
+	echo "./run_simulation <top_module> (--synthesis) (--synthVersion=<>)"
 	exit 1
 fi
 
-# Check if there is the --synthesis flag
+# Check flags
 fromSynth=0
-if [ $2 != "--synthesis" ] && [ -n $2 ]; then
-	echo "ERROR: Invalid flag $2"
-	echo "./questa.simulation_script <top_module> (--synthesis)"
-	exit 1
-fi
-
-if [ ! -z $2 ]; then
-	fromSynth=1
+if [ -n $2 ]; then
+	if [ $2 == "--synthesis" ]; then
+		fromSynth=1
+		if [ $(echo $3 | cut -f 1 -d "=") == "--synthVersion" ]; then
+			synthVersion=$(echo $3 | cut -f 2 -d "=")
+		elif [ -n $3 ]
+			echo "ERROR: Invalid flag $3"
+		fi
+	elif [ $(echo $2 | cut -f 1 -d "=") == "--synthVersion" ]; then
+		if [ -n $3 ] && [ $3 != "--synthesis"]; then
+			echo "ERROR: Invalid argument $3"
+			exit 1
+		else
+			fromSynth=1
+			synthVersion=$(echo $2 | cut -f 2 -d "=")
+		fi
+	else
+		echo "ERROR: Invalid argument $2"
+	fi
 fi
 
 top_module=$1
@@ -46,7 +57,7 @@ if [[ $PWD != "${PROJECT_DIR}/modules/${IPname}/simulations" ]]; then
 	exit 1
 fi
 
-# Configure environment variables
+# Configuration of environment variables
 export MODULE_MAIN_FOLDER="${PROJECT_DIR}/module/${IPname}/"
 export MODULE_CONFIG_FOLDER="${PROJECT_DIR}config/"
 export MODULE_LIBS_FOLDER="${MODULE_MAIN_FOLDER}libs/"
@@ -54,7 +65,7 @@ export MODULE_RTL_FOLDER="${MODULE_MAIN_FOLDER}rtl/"
 export MODULE_ASIC_FOLDER="${MODULE_MAIN_FOLDER}/asic/"
 export MODULE_BENCH_FOLDER="${MODULE_MAIN_FOLDER}testbench/"
 
-# Creates lib folders
+# Creating lib folders
 rm -r ${MODULE_LIBS_FOLDER}
 if [[ ! -d ${MODULE_LIBS_FOLDER} ]]; then
 	mkdir -p "${MODULE_LIBS_FOLDER}lib_RTL"
@@ -79,20 +90,29 @@ if [ $# -eq 0 ] && [ ${fromSynth} -eq 1 ]; then
 	echo "ERROR: You want to run a simulation on the RTL synthesis, but there is none"
 fi
 
-# Get the latest version of synthesis
-if [[ ${fromSynth} -eq 1 ]]; then
-	iter=0
-	while [ -d ${MODULE_ASIC_FOLDER}/synth/synthesis_${iter} ]; do
-		iter=$((iter+1))
-	done
-	synthVersion=$((iter-1))
-	synthDir="synthesis_${synthVersion}"
-	echo "Using RTL synthesis netlist version ${synthVersion} for simulation"
+# Getting the latest version of synthesis if no synthesis version was specified
+if [ ${fromSynth} -eq 1 ]; then
+	if [ -z $synthVersion ]; then
+		iter=0
+		while [ -d ${MODULE_ASIC_FOLDER}/synth/synthesis_${iter} ]; do
+			iter=$((iter+1))
+		done
+		if [ $iter -nq 0]
+			synthVersion=$((iter-1))
+		fi
+		synthDir="synthesis_${synthVersion}"
+	fi
+
+	if [ -d $synthDir ]; then
+		echo "Using RTL synthesis netlist version ${synthVersion} for simulation"
+	else
+		echo "ERROR: $synthDir: No such file or directory"
+		exit 1
 else
 	echo "Using RTL source files for simulation"
 fi
 
-# Compile and simulate design
+# Compiles and simulates design
 if [ $fromSynth -eq 1 ]; then
 	vlog +acc -work lib_${IPname}_SYNTH ${MODULE_ASIC_FOLDER}synth/${synthDir}/synthesis_RTL/*.v
 	vlog +acc -sv -work lib_${IPname}_TB ${MODULE_BENCH_FOLDER}src/*.sv -L lib_${IPname}_SYNTH
