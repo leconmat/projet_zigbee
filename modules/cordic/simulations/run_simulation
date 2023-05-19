@@ -1,4 +1,9 @@
 #!/bin/bash
+####################################
+## File: run_simulation
+## Author: Romain Plumaugat
+## Description: This file allows to run the simulation, not editable
+####################################
 
 # Set IP name
 IPname=$(echo $PWD | sed -e 's/^.*\/modules\/\(.*\)\/.*/\1/')
@@ -8,12 +13,20 @@ echo "#########################################"
 echo "## Run simulation flow for $IPname"
 echo "#########################################"
 
-# Check if ${PROJECT_DIR} is empty
+# Check if ${PROJECT_DIR} is empty, then source setup_ENV
 if [[ -z ${PROJECT_DIR} ]]; then
 	echo "ERROR: You need to source setup_ENV at the root of the project folder"
 	exit 1;
 fi
 
+# Check number of parameters
+if [ $# -lt 1 ]; then
+	echo "ERROR: Illegal number of parameters"
+	echo "./questa.simulation_script <top_module> (--synthesis)"
+	exit 1
+fi
+
+# Check if there is the --synthesis flag
 fromSynth=0
 if [ $2 != "--synthesis" ] && [ -n $2 ]; then
 	echo "ERROR: Invalid flag $2"
@@ -25,13 +38,6 @@ if [ ! -z $2 ]; then
 	fromSynth=1
 fi
 
-# Check number of parameters
-if [ $# -lt 1 ]; then
-	echo "ERROR: Illegal number of parameters"
-	echo "./questa.simulation_script <top_module> (--synthesis)"
-	exit 1
-fi
-
 top_module=$1
 
 # Check if you are in the right folder
@@ -41,7 +47,7 @@ if [[ $PWD != "${PROJECT_DIR}/modules/${IPname}/simulations" ]]; then
 fi
 
 # Configure environment variables
-export MODULE_MAIN_FOLDER="../"
+export MODULE_MAIN_FOLDER="${PROJECT_DIR}/module/${IPname}/"
 export MODULE_CONFIG_FOLDER="${PROJECT_DIR}config/"
 export MODULE_LIBS_FOLDER="${MODULE_MAIN_FOLDER}libs/"
 export MODULE_RTL_FOLDER="${MODULE_MAIN_FOLDER}rtl/"
@@ -50,7 +56,6 @@ export MODULE_BENCH_FOLDER="${MODULE_MAIN_FOLDER}testbench/"
 
 # Creates lib folders
 rm -r ${MODULE_LIBS_FOLDER}
-
 if [[ ! -d ${MODULE_LIBS_FOLDER} ]]; then
 	mkdir -p "${MODULE_LIBS_FOLDER}lib_RTL"
 	mkdir -p "${MODULE_LIBS_FOLDER}lib_BENCH"
@@ -58,21 +63,34 @@ if [[ ! -d ${MODULE_LIBS_FOLDER} ]]; then
 fi
 
 # Creating libraries
-vlib ${MODULE_LIBS_FOLDER}lib_RTL/lib_${IPname}
+vlib ${MODULE_LIBS_FOLDER}lib_RTL/lib_${IPname}_RTL
 vlib ${MODULE_LIBS_FOLDER}lib_BENCH/lib_${IPname}_TB
 vlib ${MODULE_LIBS_FOLDER}lib_SYNTH/lib_${IPname}_SYNTH
 
 # Mapping libraries
-vmap lib_${IPname} ${MODULE_LIBS_FOLDER}lib_RTL/lib_${IPname}
+vmap lib_${IPname} ${MODULE_LIBS_FOLDER}lib_RTL/lib_${IPname}_RTL
 vmap lib_${IPname}_TB ${MODULE_LIBS_FOLDER}lib_BENCH/lib_${IPname}_TB
 vmap lib_${IPname}_SYNTH ${MODULE_LIBS_FOLDER}lib_SYNTH/lib_${IPname}_SYNTH
 
+# Check if there is a synthesis folder if --synthesis
+shopt -s nullglob
+set -- ${MODULE_ASIC_FOLDER}/synth/synthesis_*
+if [ $# -eq 0 ] && [ ${fromSynth} -eq 1 ]; then
+	echo "ERROR: You want to run a simulation on the RTL synthesis, but there is none"
+fi
+
 # Get the latest version of synthesis
-iter=0
-while [ -d ${MODULE_ASIC_FOLDER}/synth/synthesis_${iter} ]; do
-	iter=$((iter+1))
-done
-synthDir="synthesis_$((iter-1))"
+if [[ ${fromSynth} -eq 1 ]]; then
+	iter=0
+	while [ -d ${MODULE_ASIC_FOLDER}/synth/synthesis_${iter} ]; do
+		iter=$((iter+1))
+	done
+	synthVersion=$((iter-1))
+	synthDir="synthesis_${synthVersion}"
+	echo "Using RTL synthesis netlist version ${synthVersion} for simulation"
+else
+	echo "Using RTL source files for simulation"
+fi
 
 # Compile and simulate design
 if [ $fromSynth -eq 1 ]; then

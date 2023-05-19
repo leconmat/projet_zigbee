@@ -1,4 +1,10 @@
 #!/bin/bash
+####################################
+## File: run_synthesis
+## Author: Romain Plumaugat
+## Description: This file allows to setup the synthesis and run design_vision, not editable
+##              File to run for the synthesis
+####################################
 
 iter=0
 synth_dir="synthesis"

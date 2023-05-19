@@ -1,3 +1,9 @@
+####################################
+## File: synth_flow.do
+## Author: Romain Plumaugat
+## Desciption: This file contains the design_vision flow, not editable
+####################################
+
 # Get all attributes specify in synth_attributes.do
 source synth_attributes.do
 
