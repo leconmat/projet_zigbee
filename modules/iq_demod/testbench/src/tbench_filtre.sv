@@ -6,7 +6,7 @@
 //                 2 - Echelon : Enable to see saturation of filter (output must be close to 255 (5V) at DAC output
 //                 3 - Sinus   : Measure Cut-off Frequency 
 //==============================================================================
-module tbench_filter ();
+module tbench_filtre ();
 
 timeunit      1ns;
 timeprecision 1ns;
@@ -28,6 +28,8 @@ integer i;
 filter duv (.clk(clk),         
   	    .resetn(reset),
   	    .data_in(filter_in),
+	    .validation(validation),
+	    .pret(pret),
             .data_out(filter_out)
 	    );
 
@@ -82,7 +84,7 @@ initial
 				 #100; 
 				validation = 1; 
 				 #100;
-				 validation = 0;   
+				 validation = 1;   
 					//freq = freq+0.001;
 					filter_in = sinus;
 					#100;

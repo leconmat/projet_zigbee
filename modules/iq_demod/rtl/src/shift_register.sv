@@ -5,24 +5,42 @@ module shift_register #(parameter
   input  logic                       reset,         // Synchronous Active High Reset (More Robust mapping on FPGA)
   input  logic                 [4:0] data_in,       // Input Byte
   input  logic                       data_shift_en, // Shift New byte in Delay Chain
-  input  logic [$clog2(p_depth)-1:0] data_index,    // Index of the element in delay chain propagated to data_out
-  output logic                 [4:0] data_out       // Data Register  
+  input  logic                 [2:0] index, 
+  output logic                 [4:0] data_out0, data_out1,  data_out2,  data_out3,  data_out4,  data_out5,  data_out6,  data_out7,  data_out8,  data_out9       // Data Register  
 );
 
-// == Variables Declaration ====================================================
-logic [p_depth-1:0][7:0] data_line ;
 
 // == Main Code ================================================================
 // Ici on récupère les valeurs converties pas l'ADCpour les stockers avant de les envoyer au MAC
 // pour le calcul. Pour ça, on stocke la dernière valeur récupéré à la position 31 et on décale
 // toutes les valeurs d'une position pour laisser la position 31 de libre pour la valeur suivante.
-always_ff @(posedge clk)
-  if      (reset)         data_line <= '{default:8'h00};
-  else if (data_shift_en) begin
-                            data_line[p_depth-1]   <= data_in;                // We add next sample in MSB
-                            data_line[p_depth-2:0] <= data_line[p_depth-1:1];
+always_ff @(posedge clk) begin
+  if      (~reset)         begin
+                            data_out9<=0;
+			    data_out8<=0;
+                            data_out7<=0;
+			    data_out6<=0;
+                            data_out5<=0;
+			    data_out4<=0;
+                            data_out3<=0;
+			    data_out2<=0;
+                            data_out1<=0;
+			    data_out0<=0;
+			  end
+ 
+  else if (data_shift_en && index == 3'b0) begin
+			    $display("test");
+                            data_out9<=data_out8;
+			    data_out8<=data_out7;
+                            data_out7<=data_out6;
+			    data_out6<=data_out5;
+                            data_out5<=data_out4;
+			    data_out4<=data_out3;
+                            data_out3<=data_out2;
+			    data_out2<=data_out1;
+                            data_out1<=data_out0;
+			    data_out0<=data_in;
                           end
 
-assign data_out = data_line[data_index];
-
+end
 endmodule

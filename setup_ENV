@@ -20,5 +20,6 @@ source /softslin/configCAO/AMS/config_AMS_ISR
 source /softslin/configCAO/MentorGraphics/config_Questa107c
 
 source /softslin/configCAO/Atrenta/config_Spyglass
+source /softslin/configCAO/Atrenta/config/licence_atrenta
 
 export MODELSIM="${PROJECT_DIR}/config/modelsim.ini"

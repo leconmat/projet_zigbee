@@ -4,7 +4,7 @@ module enable
 	input logic valid_ADC,
 	output logic ready_ADC);
 
-typedef enum {IDLE,ENABLE,WAIT}fsm_valid;
+typedef enum {IDLE,S_ENABLE,WAIT}fsm_valid;
 fsm_valid next_state_valid, current_state_valid;
 
  always_ff @(posedge clk, negedge resetn)
@@ -26,11 +26,10 @@ always_comb
 				if (~valid_ADC)
 					next_state_valid <= IDLE;
 				else 
-					next_state_valid <= ENABLE;
+					next_state_valid <= S_ENABLE;
 			end
-		ENABLE: 
+		S_ENABLE: 
 		     	begin
-				ready_ADC <= 1'b1;
 				next_state_valid <= WAIT; 
 			end
 		WAIT: 
@@ -42,5 +41,6 @@ always_comb
 			end
 		endcase
 	end //always_comb
+	assign ready_ADC= current_state_valid==S_ENABLE?1:0;
 endmodule
 

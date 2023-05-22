@@ -58,6 +58,6 @@ vlog +acc -sv -work lib_${IPname} ${MODULE_RTL_FOLDER}src/*.sv
 vlog +acc -sv -work lib_${IPname}_TB ${MODULE_BENCH_FOLDER}src/*.sv -L lib_${IPname}
 
 # Run simulation
-vsim -debugDB -lib lib_${IPname}_TB -L lib_${IPname} tbench_filter
+vsim -debugDB -lib lib_${IPname}_TB -L lib_${IPname} tbench_filtre
 
 # -L ${AMS_DIR}/verilog/c35b4/lib_Questa107c/c35_CORELIB zigbee_cordic_tb

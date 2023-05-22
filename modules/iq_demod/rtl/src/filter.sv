@@ -2,43 +2,46 @@
 `define Q2 0.013047
 `define Q3 0.201273
 `define Q4 0.377291
+`define Q5 0.377291
 
 
 module filter(
 
 	input logic clk,
 	input logic resetn,
-
+	input bit validation,
 	input  logic [4:0] data_in,
-	output logic [4:0] data_out
+	output logic [4:0] data_out,
+	output bit pret
 );
 
 logic data_1, data_2, out_factor;
 logic [5:0] mult;
 logic [5:0] sum;
-logic [1:0] sel;
-logic [4:0] shift_reg [7:0];
-logic validation, pret;
-logic [2:0] indicateur;
+logic [2:0] sel;
+logic [4:0] shift_reg0, shift_reg1, shift_reg2, shift_reg3, shift_reg4, shift_reg5, shift_reg6, shift_reg7, shift_reg8, shift_reg9;
 
-mux data_reg1 (.in_0(shift_reg[0]),
-	    .in_1(shift_reg[1]),
-	    .in_2(shift_reg[2]),
-	    .in_3(shift_reg[3]),
+mux2 data_reg1 (.in_0(shift_reg0),
+	    .in_1(shift_reg1),
+	    .in_2(shift_reg2),
+	    .in_3(shift_reg3),
+	    .in_4(shift_reg4),
 	    .sel(sel),
 	    .out(data_1)
 );
-mux data_reg2 (.in_0(shift_reg[7]),
-	    .in_1(shift_reg[6]),
-	    .in_2(shift_reg[5]),
-	    .in_3(shift_reg[4]),
+mux2 data_reg2 (.in_0(shift_reg9),
+	    .in_1(shift_reg8),
+	    .in_2(shift_reg7),
+	    .in_3(shift_reg6),
+	    .in_4(shift_reg5),
 	    .sel(sel),
 	    .out(data_2)
 );
-mux factor (.in_0(`Q1),
+mux2 factor (.in_0(`Q1),
 	    .in_1(`Q2),
 	    .in_2(`Q3),
 	    .in_3(`Q4),
+	    .in_4(`Q5),
 	    .sel(sel),
 	    .out(out_factor)
 );
@@ -53,8 +56,17 @@ shift_register shift_r (.clk(clk),
 			.reset(resetn),
 			.data_in(data_in),
 			.data_shift_en(validation),
-			.data_index(indicateur),
-			.data_out(shift_reg[0])
+			.data_out0(shift_reg0),
+			.data_out1(shift_reg1),
+			.data_out2(shift_reg2),
+			.data_out3(shift_reg3),
+			.data_out4(shift_reg4),
+			.data_out5(shift_reg5),
+			.data_out6(shift_reg6),
+			.data_out7(shift_reg7),
+			.data_out8(shift_reg8),
+			.data_out9(shift_reg9),
+			.index(sel)
 );
 
 typedef enum  {
@@ -80,34 +92,41 @@ always_comb
 	     unique case(current_state)
 		INIT:
 		    begin
-			shift_reg[0] = 5'b0;
-			shift_reg[1] = 5'b0;	
-			shift_reg[2] = 5'b0;
-			shift_reg[3] = 5'b0;
-			shift_reg[4] = 5'b0;	
-			shift_reg[5] = 5'b0;
-			shift_reg[6] = 5'b0;
-			shift_reg[7] = 5'b0;
+			shift_reg0 = 5'b0;
+			shift_reg1 = 5'b0;	
+			shift_reg2 = 5'b0;
+			shift_reg3 = 5'b0;
+			shift_reg4 = 5'b0;	
+			shift_reg5 = 5'b0;
+			shift_reg6 = 5'b0;
+			shift_reg7 = 5'b0;
+			shift_reg8 = 5'b0;
+			shift_reg9 = 5'b0;
 			next_state = ZERO;
 		    end
 		ZERO:
 		     begin
-			sel = 2'b00;
+			sel = 3'b000;
 			next_state = ONE;
 			end
 		ONE:
 		     begin
-			sel = 2'b01;
+			sel = 3'b001;
 			next_state = TWO;			
 			end
 		TWO:
 		     begin
-			sel = 2'b10;
+			sel = 3'b010;
 			next_state = THREE;		
 			end
 		THREE:
 		     begin
-			sel = 2'b11;
+			sel = 3'b011;
+			next_state = FOUR;
+			end
+		FOUR:
+		     begin
+			sel = 3'b100;
 			next_state = ZERO;
 			end
 		endcase
