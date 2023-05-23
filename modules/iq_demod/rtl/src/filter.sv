@@ -1,8 +1,8 @@
-`define Q1 6'h3D
-`define Q2 6'h3C
+`define Q1 6'h3E
+`define Q2 6'h3E
 `define Q3 6'h01
-`define Q4 6'h0D
-`define Q5 6'h17
+`define Q4 6'h07
+`define Q5 6'h0C
 
 module filter(
 
@@ -10,13 +10,13 @@ module filter(
 	input logic resetn,
 	input bit validation,
 	input logic [4:0] data_in,
-	output logic [4:0] data_out,
+	output logic [9:0] data_out,
 	output bit pret
 );
 
 logic [4:0] data_1, data_2;
 logic [5:0] out_factor;
-logic [5:0] mult;
+logic [9:0] mult;
 logic [5:0] sum;
 logic [2:0] sel;
 logic [4:0] shift_reg0, shift_reg1, shift_reg2, shift_reg3, shift_reg4, shift_reg5, shift_reg6, shift_reg7, shift_reg8, shift_reg9;
@@ -79,12 +79,13 @@ fsm_t current_state, next_state;
 	begin
 	     if(~resetn) begin
 		current_state <= INIT;
-		data_out <= 5'b0; 
+		data_out <= 0; 
 	     end
 	     else 
 		begin
-		current_state <= next_state;
+		if (sel == 3'b000) data_out<=0;
 		data_out <= data_out + mult;
+		current_state <= next_state;
 		end
 	end 
 

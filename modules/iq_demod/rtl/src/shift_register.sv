@@ -9,6 +9,7 @@ module shift_register #(parameter
   output logic                 [4:0] data_out0, data_out1,  data_out2,  data_out3,  data_out4,  data_out5,  data_out6,  data_out7,  data_out8,  data_out9       // Data Register  
 );
 
+logic [2:0] sstate = 3'b101;
 
 // == Main Code ================================================================
 // Ici on récupère les valeurs converties pas l'ADCpour les stockers avant de les envoyer au MAC
@@ -26,19 +27,30 @@ always_ff @(posedge clk) begin
 			    data_out2<=0;
                             data_out1<=0;
 			    data_out0<=0;
+			    sstate <= 3'b101;
 			  end
  
-  else if (data_shift_en && index == 3'b0) begin	    
-                            data_out9<=data_out8;
-			    data_out8<=data_out7;
-                            data_out7<=data_out6;
-			    data_out6<=data_out5;
-                            data_out5<=data_out4;
-			    data_out4<=data_out3;
-                            data_out3<=data_out2;
-			    data_out2<=data_out1;
-                            data_out1<=data_out0;
-			    data_out0<=data_in;
+  else if (data_shift_en) begin
+
+			    if (sstate == 3'b101) sstate<= 3'b110;
+			    else if (sstate==3'b110) begin 
+				    if (index == 3'b000) sstate <= 3'b100;
+				    else if (index == 3'b100) sstate <= 3'b000;
+				    else sstate<=index+1;
+                            end
+			    else if (index == sstate) begin 
+		                    data_out9<=data_out8;
+				    data_out8<=data_out7;
+		                    data_out7<=data_out6;
+				    data_out6<=data_out5;
+		                    data_out5<=data_out4;
+				    data_out4<=data_out3;
+		                    data_out3<=data_out2;
+				    data_out2<=data_out1;
+		                    data_out1<=data_out0;
+				    data_out0<=data_in;
+		                  end
+			   
                           end
 
 end
