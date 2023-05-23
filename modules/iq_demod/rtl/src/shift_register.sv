@@ -28,8 +28,7 @@ always_ff @(posedge clk) begin
 			    data_out0<=0;
 			  end
  
-  else if (data_shift_en && index == 3'b0) begin
-			    $display("test");
+  else if (data_shift_en && index == 3'b0) begin	    
                             data_out9<=data_out8;
 			    data_out8<=data_out7;
                             data_out7<=data_out6;

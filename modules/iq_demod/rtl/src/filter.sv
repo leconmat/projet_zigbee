@@ -1,21 +1,21 @@
-`define Q1 -0.084486
-`define Q2 0.013047
-`define Q3 0.201273
-`define Q4 0.377291
-`define Q5 0.377291
-
+`define Q1 6'h3D
+`define Q2 6'h3C
+`define Q3 6'h01
+`define Q4 6'h0D
+`define Q5 6'h17
 
 module filter(
 
 	input logic clk,
 	input logic resetn,
 	input bit validation,
-	input  logic [4:0] data_in,
+	input logic [4:0] data_in,
 	output logic [4:0] data_out,
 	output bit pret
 );
 
-logic data_1, data_2, out_factor;
+logic [4:0] data_1, data_2;
+logic [5:0] out_factor;
 logic [5:0] mult;
 logic [5:0] sum;
 logic [2:0] sel;
@@ -37,7 +37,7 @@ mux2 data_reg2 (.in_0(shift_reg9),
 	    .sel(sel),
 	    .out(data_2)
 );
-mux2 factor (.in_0(`Q1),
+mux factor (.in_0(`Q1),
 	    .in_1(`Q2),
 	    .in_2(`Q3),
 	    .in_3(`Q4),
@@ -81,9 +81,11 @@ fsm_t current_state, next_state;
 		current_state <= INIT;
 		data_out <= 5'b0; 
 	     end
-	     else
+	     else 
+		begin
 		current_state <= next_state;
 		data_out <= data_out + mult;
+		end
 	end 
 
 
@@ -92,16 +94,6 @@ always_comb
 	     unique case(current_state)
 		INIT:
 		    begin
-			shift_reg0 = 5'b0;
-			shift_reg1 = 5'b0;	
-			shift_reg2 = 5'b0;
-			shift_reg3 = 5'b0;
-			shift_reg4 = 5'b0;	
-			shift_reg5 = 5'b0;
-			shift_reg6 = 5'b0;
-			shift_reg7 = 5'b0;
-			shift_reg8 = 5'b0;
-			shift_reg9 = 5'b0;
 			next_state = ZERO;
 		    end
 		ZERO:
