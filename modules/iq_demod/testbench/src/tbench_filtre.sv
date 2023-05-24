@@ -13,7 +13,7 @@ timeprecision 1ns;
 
 bit clk = 1'b1;
 bit reset;        
-bit validation,pret;
+bit validation,sortie_valid,pret;
 logic [4:0] filter_in; 
 logic [4:0] filter_out;
 logic [1:0] cosine;
@@ -28,9 +28,10 @@ integer i;
 filter duv (.clk(clk),         
   	    .resetn(reset),
   	    .data_in(filter_in),
-	    .validation(validation),
+	    .in_valid(validation),
 	    .pret(pret),
-            .data_out(filter_out)
+            .data_out(filter_out),
+	    .out_valid(sortie_valid)
 	    );
 
  // connexion le générateur de sinus 
@@ -65,7 +66,7 @@ forever
 				 
 		#50; 
 		validation = 1;
-		filter_in = sinus;
+		filter_in = sinus<<3;
 		 #50;
 		 validation = 0; 
 		  

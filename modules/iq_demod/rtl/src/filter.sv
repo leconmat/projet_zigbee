@@ -8,18 +8,21 @@ module filter(
 
 	input logic clk,
 	input logic resetn,
-	input bit validation,
+	input bit in_valid,
 	input logic [4:0] data_in,
-	output logic [9:0] data_out,
-	output bit pret
+	output logic [4:0] data_out,
+	output bit pret,
+	output bit out_valid
 );
 
 logic [4:0] data_1, data_2;
 logic [5:0] out_factor;
-logic [9:0] mult;
+logic [12:0] mult;
 logic [5:0] sum;
 logic [2:0] sel;
+logic [12:0] temp;
 logic [4:0] shift_reg0, shift_reg1, shift_reg2, shift_reg3, shift_reg4, shift_reg5, shift_reg6, shift_reg7, shift_reg8, shift_reg9;
+logic [2:0] shift_count;
 
 mux2 data_reg1 (.in_0(shift_reg0),
 	    .in_1(shift_reg1),
@@ -48,14 +51,14 @@ mux factor (.in_0(`Q1),
 
 enable valid (.clk(clk),
 	      .resetn(resetn),
-	      .valid_ADC(validation),
+	      .valid_ADC(in_valid),
 	      .ready_ADC(pret)
 );
 
 shift_register shift_r (.clk(clk),
 			.reset(resetn),
 			.data_in(data_in),
-			.data_shift_en(validation),
+			.data_shift_en(in_valid),
 			.data_out0(shift_reg0),
 			.data_out1(shift_reg1),
 			.data_out2(shift_reg2),
@@ -66,7 +69,7 @@ shift_register shift_r (.clk(clk),
 			.data_out7(shift_reg7),
 			.data_out8(shift_reg8),
 			.data_out9(shift_reg9),
-			.index(sel)
+			.cpt_shift(shift_count)
 );
 
 typedef enum  {
@@ -79,12 +82,18 @@ fsm_t current_state, next_state;
 	begin
 	     if(~resetn) begin
 		current_state <= INIT;
-		data_out <= 0; 
+		data_out <= 0;
+		temp <= 0;
 	     end
 	     else 
 		begin
-		if (sel == 3'b000) data_out<=0;
-		data_out <= data_out + mult;
+			if (shift_count == 3'b100) begin 
+				data_out <= temp[12:8];				
+				temp <= mult;
+			end
+			else begin
+				temp <= temp + mult;
+			end
 		current_state <= next_state;
 		end
 	end 
