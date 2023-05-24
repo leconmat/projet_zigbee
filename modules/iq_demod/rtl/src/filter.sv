@@ -1,8 +1,8 @@
 `define Q1 6'h3E
 `define Q2 6'h3E
 `define Q3 6'h01
-`define Q4 6'h07
-`define Q5 6'h0C
+`define Q4 6'h06
+`define Q5 6'h0B
 
 module filter(
 
@@ -11,16 +11,17 @@ module filter(
 	input bit in_valid,
 	input logic [4:0] data_in,
 	output logic [4:0] data_out,
+	output logic [4:0] data_out2,
 	output bit pret,
 	output bit out_valid
 );
 
 logic [4:0] data_1, data_2;
 logic [5:0] out_factor;
-logic [12:0] mult;
+logic [14:0] mult;
 logic [5:0] sum;
 logic [2:0] sel;
-logic [12:0] temp;
+logic [14:0] temp;
 logic [4:0] shift_reg0, shift_reg1, shift_reg2, shift_reg3, shift_reg4, shift_reg5, shift_reg6, shift_reg7, shift_reg8, shift_reg9;
 logic [2:0] shift_count;
 
@@ -49,11 +50,6 @@ mux factor (.in_0(`Q1),
 	    .out(out_factor)
 );
 
-enable valid (.clk(clk),
-	      .resetn(resetn),
-	      .valid_ADC(in_valid),
-	      .ready_ADC(pret)
-);
 
 shift_register shift_r (.clk(clk),
 			.reset(resetn),
@@ -88,11 +84,15 @@ fsm_t current_state, next_state;
 	     else 
 		begin
 			if (shift_count == 3'b100) begin 
-				data_out <= temp[12:8];				
+				data_out <= temp[12:8];
+				data_out2 <= temp[13:9];
+				
 				temp <= mult;
+				out_valid <= 1'b1;
 			end
 			else begin
 				temp <= temp + mult;
+				out_valid <= 1'b0;
 			end
 		current_state <= next_state;
 		end

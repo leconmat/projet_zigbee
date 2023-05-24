@@ -4,17 +4,32 @@ timeprecision 1ns;
 module demod(
 	input logic clk,
 	input logic resetn,
+	input bit ADC_rdy,
 	input logic [4:0] I_IF,
 	input logic [4:0] Q_IF,
 	input logic [1:0] sine_in,
 	input logic [1:0] cosine_in,
 	output logic [4:0] I_BB,
-	output logic [4:0] Q_BB
+	output logic [4:0] Q_BB,
+	output bit demod_rdy
 );
 	logic [4:0] IS;
 	logic [4:0] IC;
 	logic [4:0] QS;
 	logic [4:0] QC;
+
+enable validation(	.clk(clk),
+			.resetn(resetn),
+			.ADC_rdy(ADC_rdy),
+			.demod_rdy(demod_rdy)
+);
+
+fsm sincos (		.clk(clk),
+			.resetn(resetn),
+			.cosine_out(cosine_in),
+			.sine_out(sine_in)
+);
+
 always_comb
 	begin
 		if (~resetn) begin
