@@ -1,0 +1,55 @@
+#!/bin/bash
+####################################
+## File: run_pnr
+## Author: Romain Plumaugat
+## Description: This file allows to setup the place & route and run innovus, not editable
+##              File to run for the place & route
+####################################
+
+# Set IP name
+IPname=$(echo $PWD | sed -e 's/^.*\/modules\/\(.*\)\/.*/\1/')
+
+# Creates the new version number of the place & route
+iter=0
+pnr_dir="synthesis"
+while [[ -d "${pnr_dir}_${iter}" ]]; do
+	iter=$((iter+1))
+done
+pnr_dir="${pnr_dir}_${iter}"
+mkdir ${pnr_dir}
+
+(
+echo "#########################################"
+echo "## Run place & route flow for $IPname"
+echo "#########################################"
+
+# Set path for the directories
+export SCRIPT_DIR="./SCRIPTS/"
+export SOURCES_DIR="./SOURCES/"
+
+# Check if ${PROJECT_DIR} is empty, then source setup_ENV
+if [[ -z ${PROJECT_DIR} ]]; then
+	echo "ERROR: You need to source setup_ENV at the root of the project folder"
+	exit 1;
+fi
+
+# Check if you are in the right folder
+if [[ ! $PWD == "${PROJECT_DIR}/modules/${IPname}/asic/synth" ]]; then
+	echo "ERROR: You need to be in the place & route directory of your module (asic/par/)"
+	exit 1
+fi
+
+# Check if all required files are present in the folder
+if [ ! -f ${SCRIPT_DIR}/vars.tcl]; then
+	echo "ERROR: Missing vars.tcl in the place & route directory (asic/par/)"
+	exit 1;
+elif [ ! -f ${SCRIPT_DIR}/amsSetup.tcl ]; then
+	echo "ERROR: Missing amsSetup.tcl in the place & route directory (asic/par/)"
+	exit 1;
+elif [ ! -f ${SCRIPT_DIR}/init.tcl ]; then
+	echo "ERROR: Missing init.tcl in the place & route directory (asic/par/)"
+	exit 1;
+else
+	cp 
+
+) 2>&1 | tee -a "${pnt_dir}/pnr.log"

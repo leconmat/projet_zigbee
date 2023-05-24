@@ -1,4 +1,4 @@
-# from the System Variable Group 
+# From the System Variable Group 
 
 set link_force_case  "check_reference"
 set link_library  {c35_CORELIB_TYP.db }
