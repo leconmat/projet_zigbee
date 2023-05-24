@@ -42,16 +42,16 @@ module zigbee_cordic_top (
 
 	// Cordic stages wires
 	// 1 wires stage more than number of cordic stages
-	reg [IQ_SIZE+1-1:0] cor_x_s0 [2-1+1:0];
-	reg [IQ_SIZE+1-1:0] cor_y_s0 [2-1+1:0];
-	reg [W_SIZE-1:0] cor_w_s0 [2-1+1:0];
+	logic [IQ_SIZE+1-1:0] cor_x_s0 [2-1+1:0];
+	logic [IQ_SIZE+1-1:0] cor_y_s0 [2-1+1:0];
+	logic [W_SIZE-1:0] cor_w_s0 [2-1+1:0];
 	
-	reg [IQ_SIZE+1-1:0] cor_x_s1 [NUM_STAGES-1+1:2];
-	reg [IQ_SIZE+1-1:0] cor_y_s1 [NUM_STAGES-1+1:2];
-	reg [W_SIZE-1:0] cor_w_s1 [NUM_STAGES-1+1:2];
+	logic [IQ_SIZE+1-1:0] cor_x_s1 [NUM_STAGES-1+1:2];
+	logic [IQ_SIZE+1-1:0] cor_y_s1 [NUM_STAGES-1+1:2];
+	logic [W_SIZE-1:0] cor_w_s1 [NUM_STAGES-1+1:2];
 
-	reg valid_s0 [2-1+1:0];
-	reg valid_s1 [NUM_STAGES-1+1:2];
+	logic valid_s0 [2-1+1:0];
+	logic valid_s1 [NUM_STAGES-1+1:2];
 
 	always @(posedge clk, negedge reset_n) begin
 		if(!reset_n) begin
@@ -61,29 +61,25 @@ module zigbee_cordic_top (
 			valid_s1[2] <= 0;
 		end
 		else begin
+			if (ibb_ibuff[IQ_SIZE-1]) begin
+				cor_x_s0[0] <= {1'b0, -ibb_ibuff};
+				cor_y_s0[0] <= {(!qbb_ibuff[IQ_SIZE-1]) && (qbb_ibuff != 0), -qbb_ibuff};
+				cor_w_s0[0] <= {1'b1, {W_SIZE-1{1'b0}}}; // 180 degrees
+			end
+			else begin
+				cor_x_s0[0] <= {1'b0, ibb_ibuff};
+				cor_y_s0[0] <= {qbb_ibuff[IQ_SIZE-1], qbb_ibuff};
+				cor_w_s0[0] <= {W_SIZE{1'b0}};
+			end
+		
+			valid_s0[0] <= iValid_ibuff;
+
 			cor_x_s1[2] <= cor_x_s0[2];
 			cor_y_s1[2] <= cor_y_s0[2];
 			cor_w_s1[2] <= cor_w_s0[2];
 			valid_s1[2] <= valid_s0[2];
 		end
 	end
-
-
-
-	//////////////////////////////////////////////////////////////////////////////////////////////
-	// Wiring of the CORDIC TOP
-	//////////////////////////////////////////////////////////////////////////////////////////////
-	// Stage input assignation, function of the sign of ibb
-	assign cor_y_s0[0] = ibb_ibuff[IQ_SIZE-1] ? {(!qbb_ibuff[IQ_SIZE-1]) && (qbb_ibuff != 0), -qbb_ibuff} :
-											 {qbb_ibuff[IQ_SIZE-1], qbb_ibuff};
-
-	assign cor_x_s0[0] = ibb_ibuff[IQ_SIZE-1] ? {1'b0, -ibb_ibuff}:
-											 {1'b0, ibb_ibuff};
-
-	assign cor_w_s0[0] = ibb_ibuff[IQ_SIZE-1] ? {1'b1, {W_SIZE-1{1'b0}}}: // 180 degree
-											 {W_SIZE{1'b0}};
-											 
-	assign valid_s0[0] = iValid_ibuff;
 
 
 
