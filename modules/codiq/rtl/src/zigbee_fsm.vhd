@@ -29,9 +29,9 @@ architecture Behavioral of zigbee_fsm is
     signal C_STATE     : StateType;        	 -- etat actuel (current state)
     signal N_STATE     : StateType;          -- etat suivant (next state)
 
-    signal cpt_old  : integer;
-    signal cpt      : integer;                      -- variable d increment compteur
-    signal cpt_next : integer;                      -- variable suivante d increment compteur
+    signal cpt_old  : std_logic_vector(2 downto 0);	-- variable precedente compteur
+    signal cpt      : std_logic_vector(2 downto 0);	-- variable d increment compteur
+    signal cpt_next : std_logic_vector(2 downto 0);	-- variable suivante d increment compteur
 
     signal S_IBB       : std_logic_vector(3 downto 0); -- variable temporaire pour IBB
     signal S_QBB       : std_logic_vector(3 downto 0); -- variable temporaire pour QBB
@@ -40,20 +40,18 @@ architecture Behavioral of zigbee_fsm is
     signal S_AI        : std_logic;  	           -- signal temporaire Ai
     signal S_AQ        : std_logic;  	           -- signal temporaire Aq
 
-    signal b_in_prev   : std_logic;	           -- stockage signal b_in
-    --signal B           : std_logic :='0';  	           -- parametre principal de la FSM dependant de b_in	
-
+    signal b_in_prev   : std_logic;	           -- stockage signal b_in	
 
     signal S_AI_next   : std_logic :='0';  	           -- signal temporaire Ai suivant
     signal S_AQ_next   : std_logic :='1';  	           -- signal temporaire Aq suivant
 
 
 
-    signal mem_array_I : mem_t_I;
-    signal mem_array_Q : mem_t_Q;
+    signal mem_array_I 		: mem_t_I;
+    signal mem_array_Q 		: mem_t_Q;
 
-    signal en_prev     : std_logic;
-    signal en_10MHz_prev     : std_logic;
+    signal en_prev			: std_logic;
+    signal en_10MHz_prev    : std_logic;
 
     signal s_b_in_prev : std_logic;
 
@@ -80,7 +78,7 @@ begin
         if(resetn = '0') then -- reset actif a 0
             en_10MHz_prev 	<= '0';
             en_prev   		<= '0';
-            cpt 			<= 0;
+            cpt 			<= (others => '0');
             S_AI      		<= '0';
             S_AQ      		<= '1';
             IBB 			<= (others => '0');
@@ -89,14 +87,14 @@ begin
             temp_QBB 		<= (others => '0');		
             b_in_prev       <= '0';
             s_b_in_prev		<= '0';
-            cpt_old 		<= 0;
+            cpt_old 		<= (others => '0');
 
         else
             if(rising_edge(clk)) then
                 en_10MHz_prev	<= en_10MHz;
                 en_prev 		<= en;
-				temp_IBB	<= S_IBB;
-				temp_QBB	<= S_QBB;
+				temp_IBB		<= S_IBB;
+				temp_QBB		<= S_QBB;
 
                 if(en_10MHz = '1' and en_10MHz_prev = '0') then                    
 					
@@ -110,7 +108,6 @@ begin
 
                 if(en = '1' and en_prev = '0') then
                     s_b_in_prev <= b_in;
-                    
 		    		S_AI    	<= S_AI_next;
                     S_AQ    	<= S_AQ_next;
                 end if;	
@@ -149,7 +146,7 @@ begin
 
             --*********************************************************************************
             when INIT =>
-                if(cpt = 4 and cpt_old = 4 and en = '0' and en_prev = '1') then
+                if(cpt = x"4" and cpt_old = x"4" and en = '0' and en_prev = '1') then
                     if(dac_ready = '0' or mem_state = '0') then
                         N_STATE <= RST_STATE;
                     else
@@ -161,7 +158,7 @@ begin
 
             --*********************************************************************************
             when I =>
-                if(cpt = 0 and cpt_old = 0 and en= '0' and en_prev = '1') then
+                if(cpt = x"0" and cpt_old = x"0" and en= '0' and en_prev = '1') then
                     if(dac_ready = '0' or mem_state = '0') then
                         N_STATE <= RST_STATE;
                     else
@@ -173,7 +170,7 @@ begin
 
             --*********************************************************************************
             when Q =>
-                if(cpt = 4 and cpt_old = 4 and en = '0' and en_prev = '1') then
+                if(cpt = x"4" and cpt_old = x"4" and en = '0' and en_prev = '1') then
                     if(dac_ready = '0' or mem_state = '0') then
                         N_STATE <= RST_STATE;
                     else
@@ -207,7 +204,7 @@ begin
 					cpt_next	<= cpt;
                 end if;
 
-                cpt_next 		<= 0;
+                cpt_next 		<= (others => '0');
                 S_QBB 			<= (others => '0');
                 S_IBB 			<= (others => '0');
 				S_AI_next		<= '0';
@@ -221,31 +218,31 @@ begin
 				S_AI_next		<= S_AI;
 				S_AQ_next		<= '1';
 
-                if(cpt < 4) then
+                if(cpt < x"4") then
 					S_AI_next	<= S_AI;
 					S_AQ_next	<= S_AQ;
-					cpt_next	<= (cpt + 1);
+					cpt_next	<= std_logic_vector(unsigned(cpt)+1);
 
-                    S_QBB <= mem_array_Q(cpt);
+                    S_QBB <= mem_array_Q(to_integer(unsigned(cpt)));
 					
                     if(S_AI = '0') then
-                        S_IBB	<= std_logic_vector(-(signed(mem_array_I(cpt))));
+                        S_IBB	<= std_logic_vector(-(signed(mem_array_I(to_integer(unsigned(cpt))))));
                     else
-                        S_IBB	<= mem_array_I(cpt);
+                        S_IBB	<= mem_array_I(to_integer(unsigned(cpt)));
                     end if;
                 else
 
-                    if (cpt = 4 and cpt_old = 3) then
+                    if (cpt = x"4" and cpt_old = x"3") then
 						cpt_next 	<= cpt;
 						S_AI_next	<= S_AI;
 						S_AQ_next	<= S_AQ;
 						
                         if(S_AI = '0') then
-                            S_IBB	<= std_logic_vector(-(signed(mem_array_I(cpt))));
+                            S_IBB	<= std_logic_vector(-(signed(mem_array_I(to_integer(unsigned(cpt))))));
                         else
-                            S_IBB	<= mem_array_I(cpt);
+                            S_IBB	<= mem_array_I(to_integer(unsigned(cpt)));
                         end if;
-                    	S_QBB 		<= mem_array_Q(cpt);
+                    	S_QBB 		<= mem_array_Q(to_integer(unsigned(cpt)));
 					end if;
 
 					if(cpt = 4 and en = '1') then
@@ -264,41 +261,41 @@ begin
 				S_AI_next		<= S_AI;
 				S_AQ_next		<= S_AQ;
 
-                if(cpt > 0) then
+                if(cpt > x"0") then
 					S_AI_next	<= S_AI;
 					S_AQ_next	<= S_AQ;
-					cpt_next   	<= (cpt - 1);
+					cpt_next   	<= std_logic_vector(unsigned(cpt)-1);
 
                     if(S_AI = '0') then
-                        S_IBB	<= std_logic_vector(-(signed(mem_array_I(cpt))));
+                        S_IBB	<= std_logic_vector(-(signed(mem_array_I(to_integer(unsigned(cpt))))));
                     else
-                        S_IBB	<= mem_array_I(cpt);
+                        S_IBB	<= mem_array_I(to_integer(unsigned(cpt)));
                     end if;
 
                     if(S_AQ = '0') then
-                        S_QBB	<= std_logic_vector(-(signed(mem_array_Q(cpt))));
+                        S_QBB	<= std_logic_vector(-(signed(mem_array_Q(to_integer(unsigned(cpt))))));
                     else
-                        S_QBB	<= mem_array_Q(cpt);
+                        S_QBB	<= mem_array_Q(to_integer(unsigned(cpt)));
                     end if;
                 else
-                    if (cpt = 0 and cpt_old = 1) then
+                    if (cpt = x"0" and cpt_old = x"1") then
 						cpt_next 	<= cpt;
 						S_AI_next	<= S_AI;
 						S_AQ_next	<= S_AQ;
 
                         if(S_AI = '0') then
-                            S_IBB    <= std_logic_vector(-(signed(mem_array_I(cpt))));
+                            S_IBB    <= std_logic_vector(-(signed(mem_array_I(to_integer(unsigned(cpt))))));
                         else
-                            S_IBB    <= mem_array_I(cpt);
+                            S_IBB    <= mem_array_I(to_integer(unsigned(cpt)));
                         end if;
 
                         if(S_AQ = '0') then
-                            S_QBB    <= std_logic_vector(-(signed(mem_array_Q(cpt))));
+                            S_QBB    <= std_logic_vector(-(signed(mem_array_Q(to_integer(unsigned(cpt))))));
                         else
-                            S_QBB    <= mem_array_Q(cpt);
+                            S_QBB    <= mem_array_Q(to_integer(unsigned(cpt)));
                         end if;   
                     end if;
-					if(cpt = 0 and en = '1') then
+					if(cpt = x"0" and en = '1') then
 						S_AQ_next	<= (b_in xor b_in_prev) xnor S_AQ;
                         S_AI_next	<= S_AI;
 						cpt_next 	<= cpt;
@@ -314,42 +311,42 @@ begin
 				S_AI_next		<= S_AI;
 				S_AQ_next		<= S_AQ;
 
-                if(cpt < 4) then
+                if(cpt < x"4") then
 					S_AI_next	<= S_AI;
 					S_AQ_next	<= S_AQ;
-					cpt_next	<= (cpt + 1);
+					cpt_next	<= std_logic_vector(unsigned(cpt)+1);
 
                     if(S_AI = '0') then
-                        S_IBB    <= std_logic_vector(-(signed(mem_array_I(cpt))));
+                        S_IBB    <= std_logic_vector(-(signed(mem_array_I(to_integer(unsigned(cpt))))));
                     else
-                        S_IBB    <= mem_array_I(cpt);
+                        S_IBB    <= mem_array_I(to_integer(unsigned(cpt)));
                     end if;
 
                     if(S_AQ = '0') then
-                        S_QBB    <= std_logic_vector(-(signed(mem_array_Q(cpt))));
+                        S_QBB    <= std_logic_vector(-(signed(mem_array_Q(to_integer(unsigned(cpt))))));
                     else
-                        S_QBB    <= mem_array_Q(cpt);
+                        S_QBB    <= mem_array_Q(to_integer(unsigned(cpt)));
                     end if;
                 else
-                    if(cpt = 4 and cpt_old = 3) then
+                    if(cpt = x"4" and cpt_old = x"3") then
 						cpt_next 	<= cpt;
 						S_AI_next	<= S_AI;
 						S_AQ_next	<= S_AQ;
 
                         if(S_AI = '0') then
-                            S_IBB    <= std_logic_vector(-(signed(mem_array_I(cpt))));
+                            S_IBB    <= std_logic_vector(-(signed(mem_array_I(to_integer(unsigned(cpt))))));
                         else
-                            S_IBB    <= mem_array_I(cpt);
+                            S_IBB    <= mem_array_I(to_integer(unsigned(cpt)));
                         end if;
 
                         if(S_AQ = '0') then
-                            S_QBB    <= std_logic_vector(-(signed(mem_array_Q(cpt))));
+                            S_QBB    <= std_logic_vector(-(signed(mem_array_Q(to_integer(unsigned(cpt))))));
                         else
-                            S_QBB    <= mem_array_Q(cpt);
+                            S_QBB    <= mem_array_Q(to_integer(unsigned(cpt)));
                         end if;
                     end if;
 
-					if (cpt = 4 and en = '1') then
+					if (cpt = x"4" and en = '1') then
 						S_AQ_next	<= S_AQ;
                         S_AI_next	<= (b_in xor b_in_prev) xnor S_AI;
 						cpt_next 	<= cpt;

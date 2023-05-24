@@ -15,7 +15,7 @@ end entity en_gen;
 
 architecture Behavioral of en_gen is
 
-   signal   cpt       : integer;
+   signal   cpt       : std_logic_vector(2 downto 0);
 
 begin
 
@@ -23,14 +23,14 @@ begin
     begin
 		if(resetn = '0') then
 			clk_out <= '0';
-			cpt		  <= 0;
+			cpt       <= (others => '0');
         else
 			if(rising_edge(clk_in)) then           
-				if(cpt >= 4) then
-					cpt       <= 0;
+				if(cpt = "100") then
+					cpt       <= (others => '0');
 					clk_out <= '1';
 				else
-					cpt <= cpt + 1;
+					cpt <= std_logic_vector(unsigned(cpt)+1);
 					clk_out <= '0';
 				end if;
 			end if;

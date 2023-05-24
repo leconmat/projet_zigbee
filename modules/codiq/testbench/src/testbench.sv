@@ -24,13 +24,7 @@ bit oldBit;
 real vali;
 real valq;
 real gapi;
-real gapimax;
 real gapq;
-real gapqmax;
-real gaptot;
-int itetot = 0;
-real moyenne;
-real ecartyp;
 real pi = 3.1416;
 
 // FIFO variables
@@ -91,9 +85,9 @@ initial begin
 
 			@(negedge clk_50MHz);
 			@(posedge clk_50MHz);
-			
+
 			en = 0;
-			
+
 			for(integer i = 0; i < 23; i = i + 1) begin
 				@(negedge clk_50MHz);
 				@(posedge clk_50MHz);
@@ -118,13 +112,8 @@ initial begin
 					vali <= 7*$cos(2*pi*0.5*j*0.02);
 				gapi <= (Ibb - vali);
 				gapq <= (Qbb - valq);
-				if (gapi < 0) begin
-					gaptot = gaptot - gapi;
-					itetot = itetot + 1;
-				end
-				else begin
-					gaptot = gaptot + gapi;
-					itetot = itetot + 1;
+				if (gapi > 1.5 | gapi < -1.5)
+					$display("l'écart de Ibb est anormalement élevé :", gapi);
 				if (gapq > 1.5 | gapq < -1.5)
 					$display("l'écart de Qbb est anormalement élevé :", gapq); 
 				j <= j+1;
