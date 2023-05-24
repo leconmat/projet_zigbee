@@ -15,13 +15,12 @@ module tbench_demod ();
 //donnée matlab
 	real I_in_matlab, Q_in_matlab;
 	real I_out_matlab, Q_out_matlab;
-	real I_out_demod_matlab, Q_out_demod_matlab;
 //conteneur des valeurs matlab	
 	integer fd_I_in, fd_I_out, fd_Q_in, fd_Q_out;
 //variable de differences
 	real out_error_I, out_error_Q;
 //cos sin
-	logic [1:0] cosine_out, sine_out; 
+	logic [1:0] cosine, sine; 
 
 demod demod_dut (	.clk(clk),
 			.resetn(reset),
@@ -30,10 +29,16 @@ demod demod_dut (	.clk(clk),
 			.I_BB(I_out_demod),
 			.Q_BB(Q_out_demod),
 			.demod_rdy(),
-			.ADC_rdy(ADC_rdytb)
+			.ADC_rdy(ADC_rdytb),
+			.cosine_in(cosine),
+			.sine_in(sine)
 );
 
-//fsm cosinsin
+fsm gen_sin_dut(	.clk(clk),
+			.resetn(reset),
+			.cosine_out(cosine),
+			.sine_out(sine)
+);
 
 	always #10 clk = ~clk; //période 20 ns = 50Mhz
 
@@ -65,13 +70,10 @@ demod demod_dut (	.clk(clk),
 			I_in_demod = integer'(I_in_matlab / quantum);
 			Q_in_demod = integer'(Q_in_matlab / quantum);
 
-			I_out_demod_matlab = I_out_demod * quantum;
-			Q_out_demod_matlab = Q_out_demod * quantum;
-
 			for(integer i  = 0; i < 5; i++) 
 			begin
-				if (i==4) ADC_rdytb = 0;
-				else ADC_rdytb = 1;
+				if (i==4) ADC_rdytb = 1;
+				else ADC_rdytb = 0;
 				@(posedge clk);
 			end
 		end
@@ -84,8 +86,8 @@ demod demod_dut (	.clk(clk),
 			$fscanf(fd_I_out, "%f\n", I_out_matlab);
 			$fscanf(fd_Q_out, "%f\n", Q_out_matlab);
 
-			I_out_matlab = I_out_matlab / quantum;
-			Q_out_matlab = Q_out_matlab / quantum;
+			I_out_matlab = I_out_matlab * quantum;
+			Q_out_matlab = Q_out_matlab * quantum;
 
 			out_error_I = I_out_matlab - I_out_demod;
 			out_error_Q = Q_out_matlab - Q_out_demod;
