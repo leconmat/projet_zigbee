@@ -21,14 +21,17 @@ module tbench_filtre_bis ();
 	real matlab_in_I_real, matlab_in_Q_real;
 	real matlab_out_I_real, matlab_out_Q_real;
 
-	integer matlab_in_I_digital, matlab_in_Q_digital;
-	integer matlab_out_I_digital, matlab_out_Q_digital;
-
 	typedef logic signed [4:0] sample_t;
+
+
+	sample_t matlab_in_I_digital, matlab_in_Q_digital;
+	sample_t matlab_out_I_digital, matlab_out_Q_digital;
 	
 	integer fd_I_in, fd_I_out, fd_Q_in, fd_Q_out;
 
 	real out_error_I, out_error_Q;
+
+	sin_wave sinus(1,  filter_in_I_real);
 
 	 // connexion avec le filtre
 	filter dut_I (.clk(clk),         
@@ -73,14 +76,14 @@ module tbench_filtre_bis ();
 
 		forever //ici c'est magique pas de comb ni de séquentiel
 		begin
-			$fscanf(fd_I_in, "%f\n", matlab_in_I_real);
-			$fscanf(fd_Q_in, "%f\n", matlab_in_Q_real);
+			//$fscanf(fd_I_in, "%f\n", matlab_in_I_real);
+			//$fscanf(fd_Q_in, "%f\n", matlab_in_Q_real);
 
-			filter_in_I_real = matlab_in_I_real;
-			filter_in_Q_real = matlab_in_Q_real;
+			//filter_in_I_real = matlab_in_I_real;
+			//filter_in_Q_real = matlab_in_Q_real;
 
-			filter_in_I_digital = sample_t'(filter_in_I_real / quantum);
-			filter_in_Q_digital = sample_t'(filter_in_Q_real / quantum);
+			filter_in_I_digital = integer'(filter_in_I_real / quantum);
+			filter_in_Q_digital = integer'(filter_in_Q_real / quantum);
 
 			matlab_in_I_digital = sample_t'(matlab_in_I_real / quantum);
 			matlab_in_Q_digital = sample_t'(matlab_in_Q_real / quantum);
