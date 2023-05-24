@@ -45,7 +45,7 @@ architecture Behavioral of zigbee_fsm is
 
 
     signal S_AI_next   : std_logic :='0';  	           -- signal temporaire Ai suivant
-    signal S_AQ_next   : std_logic :='0';  	           -- signal temporaire Aq suivant
+    signal S_AQ_next   : std_logic :='1';  	           -- signal temporaire Aq suivant
 
 
 
@@ -82,7 +82,7 @@ begin
             en_prev   		<= '0';
             cpt 			<= 0;
             S_AI      		<= '0';
-            S_AQ      		<= '0';
+            S_AQ      		<= '1';
             IBB 			<= (others => '0');
             QBB 			<= (others => '0');
 			temp_IBB 		<= (others => '0');
@@ -201,7 +201,7 @@ begin
 
                 if(mem_state = '1' and dac_ready = '1' and en = '1') then
                     S_AI_next 	<= b_in;
-                    S_AQ_next 	<= '1';
+                    S_AQ_next 	<= S_AQ;
 					S_IBB		<= temp_IBB;
 					S_QBB		<= temp_QBB;
 					cpt_next	<= cpt;
@@ -211,7 +211,7 @@ begin
                 S_QBB 			<= (others => '0');
                 S_IBB 			<= (others => '0');
 				S_AI_next		<= '0';
-				S_AQ_next		<= '0';
+				S_AQ_next		<= '1';
 
             --*********************************************************************************
             when INIT =>
@@ -223,7 +223,7 @@ begin
 
                 if(cpt < 4) then
 					S_AI_next	<= S_AI;
-					S_AQ_next	<= '1';
+					S_AQ_next	<= S_AQ;
 					cpt_next	<= (cpt + 1);
 
                     S_QBB <= mem_array_Q(cpt);
@@ -238,7 +238,7 @@ begin
                     if (cpt = 4 and cpt_old = 3) then
 						cpt_next 	<= cpt;
 						S_AI_next	<= S_AI;
-						S_AQ_next	<= '1';
+						S_AQ_next	<= S_AQ;
 						
                         if(S_AI = '0') then
                             S_IBB	<= std_logic_vector(-(signed(mem_array_I(cpt))));
@@ -249,7 +249,7 @@ begin
 					end if;
 
 					if(cpt = 4 and en = '1') then
-                    	S_AQ_next	<= '1';
+                    	S_AQ_next	<= S_AQ;
                         S_AI_next	<= (b_in xor b_in_prev) xnor S_AI;
 						cpt_next 	<= cpt;
 						S_IBB		<= temp_IBB;
