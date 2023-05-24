@@ -26,7 +26,7 @@ module cordic_cdr_asm_tb (
 	//Stimulation signals
 	bit newBit;
 	bit bitstream_i[$];
-	real angle = 0.5;
+	real angle = 0;
 	real dataPassed = 0;
 	real dataFailed = 0;
 
@@ -70,6 +70,8 @@ module cordic_cdr_asm_tb (
 					angle = angle + PI / (2 * 5);
 				else
 					angle = angle - PI / (2 * 5);
+
+				angle = angle + (($urandom() % 1000) / 10000) - 0.05;
 
 				//wrapper
 				if (angle < 0)
