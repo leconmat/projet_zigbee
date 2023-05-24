@@ -74,7 +74,7 @@ module zigbee_cordic_top (
 	// Wiring of the CORDIC TOP
 	//////////////////////////////////////////////////////////////////////////////////////////////
 	// Stage input assignation, function of the sign of ibb
-	assign cor_y_s0[0] = ibb_ibuff[IQ_SIZE-1] ? {!qbb_ibuff[IQ_SIZE-1], -qbb_ibuff} :
+	assign cor_y_s0[0] = ibb_ibuff[IQ_SIZE-1] ? {(!qbb_ibuff[IQ_SIZE-1]) && (qbb_ibuff != 0), -qbb_ibuff} :
 											 {qbb_ibuff[IQ_SIZE-1], qbb_ibuff};
 
 	assign cor_x_s0[0] = ibb_ibuff[IQ_SIZE-1] ? {1'b0, -ibb_ibuff}:
