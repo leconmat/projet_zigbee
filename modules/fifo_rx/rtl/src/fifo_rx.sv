@@ -5,8 +5,8 @@ module fifo_rx #(
 )				
 (
 	clk, // horloge systeme 
-	pclk, // horloge APB
 	reset_n,
+	cdr_en,
 
 	// APB signals
 	pwdata,
@@ -29,8 +29,8 @@ module fifo_rx #(
 // IO declarations
 //////////////////////////////////////////////
 input logic clk, // horloge systeme 
-input logic pclk, // horloge APB
 input logic reset_n,
+
 
 // APB signals
 input logic pwdata,
@@ -42,15 +42,137 @@ output logic pready,
 output logic pslverr,
 
 // Output Tx
-output logic [7:0] data_out, 
+output logic [WIDTH-1:0] data_out, 
 // output logic IQ_rate,
 output reg mem_state // 0 memoire vide, 1 memoire remplie ou partiellement remplie
 
 
 
+// Store one bit data into shift register
+always @(posedge clk, negedge reset_n) begin
+	if (!reset_n) begin
+		for (i = 0; i < WIDTH; i++) begin
+			shift_regiter[i] <= 0;
+		end
+	end
+	else begin
+		for (i = 0; i < WIDTH; i++) begin
+			shift_regiter[i] <= pwdata;
+		end
+	end
+end
 
 
 
+//////////////////////////////////////////////
+// Internal signals
+//////////////////////////////////////////////
+// Memory signals 
+parameter PTR_WIDTH = $clog2(DEPTH);
+logic [WIDTH-1:0] mem [DEPTH-1:0] ;
+// Memory pointers	
+logic [PTR_WIDTH:0] wr_ptr, rd_ptr;
+// Memory flag
+logic full;  
+logic empty; 
+// Rate change counters 50 MHz -> 2 MHz
+reg [4:0] counter_clock;
+reg [2:0] compteur;
+reg [7:0] shift_register;
+integer i;
+logic load;
+
+//////////////////////////////////////////////
+// BEGIN MEMORY LOGIC 
+//////////////////////////////////////////////
+// Pointers managing
+always_comb begin
+	if((wr_ptr[PTR_WIDTH-1:0]) == (rd_ptr[PTR_WIDTH-1:0])) begin
+		full = (wr_ptr[PTR_WIDTH]) ^ (rd_ptr[PTR_WIDTH]); // carry different => full 
+		empty = wr_ptr[PTR_WIDTH] ~^ rd_ptr[PTR_WIDTH]; // carry identique => empty
+	end
+	else begin
+		full = 0;
+		empty = 0;
+	end
+end
+
+// Memory state logic 
+always_comb begin 
+	if (empty == 1'b1) begin
+		mem_state = 1'b0; // Memoire vide 
+	end
+	else
+		mem_state = 1'b1;
+end
+
+// APB Error logic
+always_comb begin
+	if (full == 1) begin 
+		pslverr = 1'b1; // Memoire pleine 
+	end
+	else 
+		pslverr =1'b0;
+end
+
+//////////////////////////////////////////////
+// END MEMORY LOGIC 
+//////////////////////////////////////////////
+
+
+
+//////////////////////////////////////////////
+// BEGIN WRITE LOGIC 
+//////////////////////////////////////////////
+assign pready = 1;
+assign paddr = 8'b00000000;
+
+always_ff @(posedge clk) begin
+	if(!en_cdr)
+		mem[wr_ptr] <= pwdata;
+	else
+		mem[wr_ptr] <= mem[wr_ptr];
+end	
+
+// Write pointer logic
+always_ff @(posedge clk, negedge reset_n) begin
+	if(!reset_n) begin
+		wr_ptr <= 'h0;
+	end
+	else begin
+		if(!en_cdr)
+			wr_ptr <= wr_ptr + 1;
+		else
+			wr_ptr <= wr_ptr;
+	end
+end
+
+
+
+//////////////////////////////////////////////
+// BEGIN READ LOGIC
+//////////////////////////////////////////////
+assign rd_en = psel && penable && !pwrite && !empty;
+
+always_ff @(posedge clk) begin
+	if(rd_en)
+		data_out[rd_ptr] <= pwdata;
+	else
+		mem[wr_ptr] <= mem[wr_ptr];
+end	
+
+// Write pointer logic
+always_ff @(posedge clk, negedge reset_n) begin
+	if(~reset_n) begin
+		wr_ptr <= 'h0;
+	end
+	else begin
+		if(wr_en)
+			wr_ptr <= wr_ptr + 1;
+		else
+			wr_ptr <= wr_ptr;
+	end
+end
 
 
 endmodule
