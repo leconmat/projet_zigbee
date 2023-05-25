@@ -4,11 +4,9 @@ module FIFO_Tx #(
 					parameter DEPTH = 64
 )				
 (					input logic clk, // horloge système 
-					input logic pclk, // horloge APB
 					input logic reset_n,
 					// APB signals
 					input logic [7:0] pwdata,
-					input logic [7:0] paddr,
 					input logic psel,
 					input logic pwrite,
 					input logic penable,
@@ -84,7 +82,6 @@ end
 /////////////////////////////////////////////////////////////////////////////////////////
 
 assign pready = 1;
-assign paddr = 8'b00000000;
 assign wr_en = psel && penable && pwrite && !full;
 
 /*typedef enum logic {
@@ -93,7 +90,7 @@ assign wr_en = psel && penable && pwrite && !full;
     } fsm_wr;
 fsm_wr state_wr, next_state_wr;
 
-always_ff @(posedge pclk, negedge reset_n) 
+always_ff @(posedge clk, negedge reset_n) 
 begin
 	if (~reset_n) 
 	    state_wr <= Idle_Write;
@@ -134,7 +131,7 @@ always_comb begin
 end */
 
 
-always_ff @(posedge pclk) begin
+always_ff @(posedge clk) begin
 	if(wr_en)
 		mem[wr_ptr] <= pwdata;
 	else
@@ -142,7 +139,7 @@ always_ff @(posedge pclk) begin
 end	
 
 // Write pointer logic
-always_ff @(posedge pclk, negedge reset_n) begin
+always_ff @(posedge clk, negedge reset_n) begin
 	if(~reset_n) begin
 		wr_ptr <= 'h0;
 	end
@@ -231,18 +228,18 @@ end */
 // Output generation at 2MHz
 always @(posedge clk, negedge reset_n) begin 
 	if (~reset_n) begin
-		counter_clock <= 24;
+		counter_clock <= 0;
 		compteur <= 0;
-		IQ_rate <= 0;
+		IQ_rate <=  0;
 		rd_ptr <= 'h0;
 	end
 	else if (state_rd == Read) begin
 		if(counter_clock == 13) begin
-			IQ_rate <= ~IQ_rate;
+			IQ_rate <= 1;
 			counter_clock <= counter_clock + 1;
 		end
 		else if (counter_clock==24) begin 
-			IQ_rate <= ~ IQ_rate;
+			IQ_rate <= 0;
 			counter_clock <= 'b0;
 			if(compteur == 7) begin
 				compteur <= 'b0;
@@ -255,7 +252,7 @@ always @(posedge clk, negedge reset_n) begin
 			counter_clock <= counter_clock + 1;
 	end
 	else begin
-		counter_clock <= 24;
+		counter_clock <= 0;
 		compteur <= 0;
 		IQ_rate <= 0;
 	end
