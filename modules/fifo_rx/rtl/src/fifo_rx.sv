@@ -46,19 +46,20 @@ output logic [WIDTH-1:0] data_out,
 // output logic IQ_rate,
 output reg mem_state // 0 memoire vide, 1 memoire remplie ou partiellement remplie
 
-
+reg i = 0;
 
 // Store one bit data into shift register
 always @(posedge clk, negedge reset_n) begin
 	if (!reset_n) begin
-		for (i = 0; i < WIDTH; i++) begin
-			shift_regiter[i] <= 0;
-		end
+			shift_regiter <= 8'b00000000;
 	end
 	else begin
-		for (i = 0; i < WIDTH; i++) begin
-			shift_regiter[i] <= pwdata;
+		if (i >= WIDTH) begin
+			i <= 0;
 		end
+		else begin
+			shift_regiter[i] <= pwdata;
+			i <= i + 1;
 	end
 end
 
@@ -69,7 +70,7 @@ end
 //////////////////////////////////////////////
 // Memory signals 
 parameter PTR_WIDTH = $clog2(DEPTH);
-logic [WIDTH-1:0] mem [DEPTH-1:0] ;
+logic [WIDTH-1:0] mem [DEPTH-1:0];
 // Memory pointers	
 logic [PTR_WIDTH:0] wr_ptr, rd_ptr;
 // Memory flag
@@ -129,7 +130,7 @@ assign paddr = 8'b00000000;
 
 always_ff @(posedge clk) begin
 	if(!en_cdr)
-		mem[wr_ptr] <= pwdata;
+		mem[wr_ptr] <= shift_register;
 	else
 		mem[wr_ptr] <= mem[wr_ptr];
 end	
@@ -146,6 +147,9 @@ always_ff @(posedge clk, negedge reset_n) begin
 			wr_ptr <= wr_ptr;
 	end
 end
+//////////////////////////////////////////////
+// END WRITE LOGIC 
+//////////////////////////////////////////////
 
 
 
@@ -156,23 +160,25 @@ assign rd_en = psel && penable && !pwrite && !empty;
 
 always_ff @(posedge clk) begin
 	if(rd_en)
-		data_out[rd_ptr] <= pwdata;
+		data_out[rd_ptr] <= mem[rd_ptr];
 	else
-		mem[wr_ptr] <= mem[wr_ptr];
+		data_out[rd_ptr] <= data_out[rd_ptr];
 end	
 
-// Write pointer logic
 always_ff @(posedge clk, negedge reset_n) begin
-	if(~reset_n) begin
-		wr_ptr <= 'h0;
+	if(!reset_n) begin
+		rd_ptr <= 'h0;
 	end
 	else begin
-		if(wr_en)
-			wr_ptr <= wr_ptr + 1;
-		else
-			wr_ptr <= wr_ptr;
+		if (rd_en) begin
+			rd_ptr <= rd_ptr + 1;
+		end
+		else begin
+			rd_ptr <= rd_ptr;
+		end
 	end
 end
-
-
+//////////////////////////////////////////////
+// END READ LOGIC
+//////////////////////////////////////////////
 endmodule
