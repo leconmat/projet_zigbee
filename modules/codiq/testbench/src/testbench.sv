@@ -24,7 +24,14 @@ bit oldBit;
 real vali;
 real valq;
 real gapi;
+real gapimax;
 real gapq;
+real gapqmax;
+real gaptot;
+int itetot = 0;
+real moyenne;
+real variance;
+real ecartyp;
 real pi = 3.1416;
 
 // FIFO variables
@@ -101,90 +108,133 @@ initial begin
 	#210ns;
 
 	forever @(posedge clk_50MHz) begin
-		case (sel)
-			1'b0 : begin
-				signI <= bin;
-				signQ <= 1;
-				valq <= 7*$sin(2*pi*0.5*j*0.02);
-				if (signI == 0) 
-					vali <= -7*$cos(2*pi*0.5*j*0.02);
-				else
-					vali <= 7*$cos(2*pi*0.5*j*0.02);
-				gapi <= (Ibb - vali);
-				gapq <= (Qbb - valq);
-				if (gapi > 1.5 | gapi < -1.5)
-					$display("l'écart de Ibb est anormalement élevé :", gapi);
-				if (gapq > 1.5 | gapq < -1.5)
-					$display("l'écart de Qbb est anormalement élevé :", gapq); 
-				j <= j+1;
-				if (j == 24) begin
-					sel <= 1;
-					oldBit <= bin;
-					j <= 0;
-					nextsignI <= (oldBit ^ bin) ~^ signI;
-				end
-			end
-			1'b1 : begin
-				if (j == 0) 
-					change = ~change;
-				if (change == 0) begin
-					if (j == 0)
-						signI <= nextsignI;
-					if (signI == 0)
-						vali <= -7*$sin(2*pi*0.5*j*0.02);
-					else if (signI == 1)
-						vali <= 7*$sin(2*pi*0.5*j*0.02);
-					else begin
-						$display("Erreur valeur change", change);
-						$finish;
-					end
-					if (signQ == 0)
-						valq <= -7*$cos(2*pi*0.5*j*0.02);
-					else if (signQ == 1)
-						valq <= 7*$cos(2*pi*0.5*j*0.02);
-					else begin
-						$display("Erreur valeur change", change);
-						$finish;
-					end
-					if (j == 24)
-						nextsignQ <= (oldBit ^ bin) ~^ signQ;
-				end
-				else if (change == 1) begin
-					if (j == 0)
-						signQ <= nextsignQ;
-					if (signI == 0)
+		if (dac_ready == 1 & mem_state == 1) begin		
+			case (sel)
+				1'b0 : begin
+					signI <= bin;
+					signQ <= 1;
+					valq <= 7*$sin(2*pi*0.5*j*0.02);
+					if (signI == 0) 
 						vali <= -7*$cos(2*pi*0.5*j*0.02);
-					else if (signI == 1)
+					else
 						vali <= 7*$cos(2*pi*0.5*j*0.02);
-					else begin
-						$display("Erreur valeur change", change);
-						$finish;
+					gapi <= (Ibb - vali);
+					gapq <= (Qbb - valq);
+					if (gapi < 0) begin
+						gaptot <= gaptot - gapi;
+						itetot <= itetot + 1;
 					end
-					if (signQ == 0)
-						valq <= -7*$sin(2*pi*0.5*j*0.02);
-					else if (signQ == 1)
-						valq <= 7*$sin(2*pi*0.5*j*0.02);
-					else begin
-						$display("Erreur valeur change", change);
-						$finish;
+					else if (gapi >= 0) begin
+						gaptot <= gaptot + gapi;
+						itetot <= itetot + 1;
 					end
-					if (j == 24)
+					if (gapq < 0) begin
+						gaptot <= gaptot - gapq;
+						itetot <= itetot + 1;
+					end
+					else if (gapi >= 0) begin
+						gaptot <= gaptot + gapq;
+						itetot <= itetot + 1;
+					end
+					j <= j+1;
+					if (j == 24) begin
+						sel <= 1;
+						oldBit <= bin;
+						j <= 0;
 						nextsignI <= (oldBit ^ bin) ~^ signI;
+					end
 				end
-				gapi <= (Ibb - vali);
-				gapq <= (Qbb - valq);
-				if (gapi > 1.5 | gapi < -1.5)
-					$display("l'écart de Ibb est anormalement élevé :", gapi);
-				if (gapq > 1.5 | gapq < -1.5)
-					$display("l'écart de Qbb est anormalement élevé :", gapq); 
-				j <= j+1;
-				if (j == 24) begin
-					oldBit <= bin;
-					j <= 0;
-				end	
-			end
-			default : $finish;
-		endcase
+				1'b1 : begin
+					if (j == 0) 
+						change = ~change;
+					if (change == 0) begin
+						if (j == 0)
+							signI <= nextsignI;
+						if (signI == 0)
+							vali <= -7*$sin(2*pi*0.5*j*0.02);
+						else if (signI == 1)
+							vali <= 7*$sin(2*pi*0.5*j*0.02);
+						else begin
+							$display("Erreur valeur change", change);
+							$finish;
+						end
+						if (signQ == 0)
+							valq <= -7*$cos(2*pi*0.5*j*0.02);
+						else if (signQ == 1)
+							valq <= 7*$cos(2*pi*0.5*j*0.02);
+						else begin
+							$display("Erreur valeur change", change);
+							$finish;
+						end
+						if (j == 24)
+							nextsignQ <= (oldBit ^ bin) ~^ signQ;
+					end
+					else if (change == 1) begin
+						if (j == 0)
+							signQ <= nextsignQ;
+						if (signI == 0)
+							vali <= -7*$cos(2*pi*0.5*j*0.02);
+						else if (signI == 1)
+							vali <= 7*$cos(2*pi*0.5*j*0.02);
+						else begin
+							$display("Erreur valeur change", change);
+							$finish;
+						end
+						if (signQ == 0)
+							valq <= -7*$sin(2*pi*0.5*j*0.02);
+						else if (signQ == 1)
+							valq <= 7*$sin(2*pi*0.5*j*0.02);
+						else begin
+							$display("Erreur valeur change", change);
+							$finish;
+						end
+						if (j == 24)
+							nextsignI <= (oldBit ^ bin) ~^ signI;
+					end
+					gapi <= (Ibb - vali);
+					gapq <= (Qbb - valq);
+					if (gapi < 0) begin
+						gaptot <= gaptot - gapi;
+						itetot <= itetot + 1;
+					end
+					else if (gapi >= 0) begin
+						gaptot <= gaptot + gapi;
+						itetot <= itetot + 1;
+					end
+					if (gapq < 0) begin
+						gaptot <= gaptot - gapq;
+						itetot <= itetot + 1;
+					end
+					else if (gapi >= 0) begin
+						gaptot <= gaptot + gapq;
+						itetot <= itetot + 1;
+					end
+					j <= j+1;
+					if (j == 24) begin
+						oldBit <= bin;
+						j <= 0;
+					end	
+				end
+				default : $finish;
+			endcase
+		end
+		else begin
+			vali = 0;
+			valq = 0;
+		end
+		if (itetot == 29980) begin
+			//dac_ready = 0;
+			mem_state = 0;
+			j = 0;
+			sel = 0;
+			change = 1;
+			moyenne = gaptot / itetot;
+			#20ns;
+			$display ("L'écart moyen entre la théorie et la valeur pratique est : ",moyenne);
+			#850ns;
+			//dac_ready = 1;
+			mem_state = 1;
+		end
 	end
 end
 endmodule
