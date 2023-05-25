@@ -10,8 +10,8 @@ module tbench_demod ();
 //liaison bloc0,00787
 	logic [6:0] I_in_demod;
 	logic [6:0] Q_in_demod;
-	logic [6:0] I_out_demod;
-	logic [6:0] Q_out_demod;
+	logic [8:0] I_out_demod;
+	logic [8:0] Q_out_demod;
 //donnée matlab
 	real I_in_matlab, Q_in_matlab;
 	real I_out_matlab, Q_out_matlab;
