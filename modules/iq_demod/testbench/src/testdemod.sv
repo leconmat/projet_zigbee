@@ -6,12 +6,12 @@ module tbench_demod ();
 	bit reset;
 	bit ADC_rdytb;
 	
-	parameter real quantum = 0.03226;
-//liaison bloc
-	logic [4:0] I_in_demod;
-	logic [4:0] Q_in_demod;
-	logic [4:0] I_out_demod;
-	logic [4:0] Q_out_demod;
+	parameter real quantum = 0.00787;
+//liaison bloc0,00787
+	logic [6:0] I_in_demod;
+	logic [6:0] Q_in_demod;
+	logic [6:0] I_out_demod;
+	logic [6:0] Q_out_demod;
 //donnée matlab
 	real I_in_matlab, Q_in_matlab;
 	real I_out_matlab, Q_out_matlab;
@@ -22,7 +22,7 @@ module tbench_demod ();
 //cos sin
 	logic [1:0] cosine, sine; 
 
-demod demod_dut (	.clk(clk),
+demodulation demod_dut (	.clk(clk),
 			.resetn(reset),
 			.I_IF(I_in_demod),
 			.Q_IF(Q_in_demod),
@@ -61,7 +61,6 @@ fsm gen_sin_dut(	.clk(clk),
 		#100;
 		reset = 1;
 		
-
 		forever //ici c'est magique pas de comb ni de séquentiel
 		begin
 			$fscanf(fd_I_in, "%f\n", I_in_matlab);
