@@ -1,0 +1,50 @@
+#!/bin/bash
+####################################
+## File: run_synthesis
+## Author: Romain Plumaugat
+## Description: This file allows to setup the synthesis and run design_vision, not editable
+##              File to run for the synthesis
+####################################
+
+# Creates the new version number of the synthesis
+iter=0
+synth_dir="synthesis"
+while [[ -d "${synth_dir}_${iter}" ]]; do
+	iter=$((iter+1))
+done
+synth_dir="${synth_dir}_${iter}"
+mkdir ${synth_dir}
+
+(
+# Set IP name
+IPname=$(echo $PWD | sed -e 's/^.*\/modules\/\([a-z]*\)\/.*/\1/')
+echo $IPname
+
+echo "#########################################"
+echo "## Run synthesis flow for $IPname"
+echo "#########################################"
+
+# Check if ${PROJECT_DIR} is empty
+if [[ -z ${PROJECT_DIR} ]]; then
+	echo "ERROR: You need to source setup_ENV at the root of the project folder"
+	exit 1;
+fi
+
+# Check if you are in the right folder
+if [[ ! $PWD == "${PROJECT_DIR}/modules/${IPname}/asic/synth" ]]; then
+	echo "ERROR: You need to be in the synthesis directory of your module (asic/synth/)"
+	exit 1
+fi
+
+# Check if the .synopsys_dc.setup exists
+if [[ ! -e .synopsys_dc.setup ]]; then
+	echo "ERROR: Missing .synopsys_dc.setup file"
+	exit 1
+fi
+
+export IPmodule=$IPname
+
+cp synth_attributes.do ${synth_dir}
+cp .synopsys_dc.setup ${synth_dir}
+cd ${synth_dir} && design_vision -f ../synth_flow.do -no_gui
+) 2>&1 | tee -a "${synth_dir}/synthesis.log"
