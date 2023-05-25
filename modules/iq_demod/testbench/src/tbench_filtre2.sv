@@ -29,9 +29,9 @@ module tbench_filtre_bis ();
 	
 	integer fd_I_in, fd_I_out, fd_Q_in, fd_Q_out;
 
-	real out_error_I, out_error_Q;
+	real out_error_I, out_error_Q, temp_error_Q_positif,temp_error_Q_negatif, temp_error_I;
 
-	sin_wave sinus(1,  filter_in_I_real);
+	sin_wave sinus1(750,  filter_in_I_real);
 
 	 // connexion avec le filtre
 	filter dut_I (.clk(clk),         
@@ -85,6 +85,9 @@ module tbench_filtre_bis ();
 			filter_in_I_digital = integer'(filter_in_I_real / quantum);
 			filter_in_Q_digital = integer'(filter_in_Q_real / quantum);
 
+			//filter_in_I_digital = sample_t'(filter_in_I_real / quantum);
+			//filter_in_Q_digital = sample_t'(filter_in_Q_real / quantum);
+
 			matlab_in_I_digital = sample_t'(matlab_in_I_real / quantum);
 			matlab_in_Q_digital = sample_t'(matlab_in_Q_real / quantum);
 
@@ -109,17 +112,20 @@ module tbench_filtre_bis ();
 			$fscanf(fd_I_out, "%f\n", matlab_out_I_real);
 
 			//matlab_out_I_real = matlab_out_I_real / quantum;
+			temp_error_I = matlab_out_I_real - filter_out_I_real;
 
-			out_error_I = matlab_out_I_real - filter_out_I_digital;
+			
 		end
 
 		if(out_valid_Q)
 		begin
 			$fscanf(fd_Q_out, "%f\n", matlab_out_Q_real);
-
 			//matlab_out_Q_real = matlab_out_Q_real / quantum;
-
-			out_error_Q = matlab_out_Q_real - filter_out_Q_digital;
+			temp_error_Q_positif = matlab_out_Q_real - filter_out_Q_real;
+			temp_error_Q_negatif = filter_out_Q_real - matlab_out_Q_real;
+				if (temp_error_Q_positif > temp_error_Q_negatif) out_error_Q = temp_error_Q_negatif;
+				else out_error_Q = temp_error_Q_positif;		 	  
+	
 		end
 	end
 	
