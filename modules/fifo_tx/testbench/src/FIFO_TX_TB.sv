@@ -59,52 +59,53 @@ end
 
 
 initial begin
+		en_IQ = 0;
+		pwdata = 8'b00000000;	
+		psel = 1'b0;
+	   	pwrite = 1'b0;
+	   	penable = 1'b0;
 		reset_n = 0;
 		#20;
 		reset_n = 1;
+		
 // Ecriture normale 
-		en_IQ =0;
 	   	psel = 1'b1;
 	   	pwrite = 1'b1;
 	   	penable = 1'b1;
-	   	pwdata = 8'b00000000;		
+	   			
 		for(integer i = 0 ; i < 64 ; i++) begin 
-			pwdata <= pwdata + 1;
+			pwdata <= i;
 			#20;
 		end
 		penable = 1'b0;
-//lecture normale
+// Lecture normale
 		#20;
 		en_IQ = 1'b1;  
 		$display("Donnée lue : %h", data_out);
-/*	
-//Lecture sur une FIFO vide
-			PWDATA = 8'b00000000;
-			en_IQ = 1'b1;
-			#10;
-			$display("Donnée lue : %h", data_out);
+	
+// Lecture depuis une FIFO vide
+		/*pwdata = 8'b00000000;
+		en_IQ = 1'b1;
+		#10;
+		$display("Donnée lue : %h", data_out);*/
 
-	  if (PREADY) begin
-		  $display("Data Out: %h", data_out);
-		  $display("IQ Rate: %b", IQ_rate);
-		  $display("Memory State: %b", mem_state);
-		end
-*/
-		// Terminer la simulation
+// Test APB 
+
+// Ecriture dans une mémoire pleine 
 		
 	
 	
 end
   	 
 	  // Affichage des valeurs de sortie
-	 // always @(posedge clk) begin
-		//if (PREADY) begin
-		 // $display("Data Out: %h", data_out);
-		  //$display("IQ Rate: %b", IQ_rate);
-		  //$display("Memory State: %b", mem_state);
-		//end
+	  /*always @(posedge clk) begin
+		if (PREADY) begin
+			$display("Data Out: %h", data_out);
+		  	$display("IQ Rate: %b", IQ_rate);
+		  	$display("Memory State: %b", mem_state);
+		end
 		// Terminer la simulation
-		//$finish;
-	  //end
+		$finish;
+	  end*/
 	
 endmodule
