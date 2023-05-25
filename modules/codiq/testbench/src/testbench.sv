@@ -90,12 +90,14 @@ initial begin
 			bin = newBit;
 			en = 1;
 
-			@(negedge clk_50MHz);
-			@(posedge clk_50MHz);
+			for(integer i = 0; i < 13; i++) begin
+				@(negedge clk_50MHz);
+				@(posedge clk_50MHz);
+			end
 
 			en = 0;
 
-			for(integer i = 0; i < 23; i = i + 1) begin
+			for(integer k = 13; k < 24; k++) begin
 				@(negedge clk_50MHz);
 				@(posedge clk_50MHz);
 			end
@@ -105,7 +107,7 @@ end
 
 initial begin
 
-	#210ns;
+	#190ns;
 
 	forever @(posedge clk_50MHz) begin
 		if (dac_ready == 1 & mem_state == 1) begin		
@@ -222,9 +224,9 @@ initial begin
 			vali = 0;
 			valq = 0;
 		end
-		if (itetot == 29980) begin
-			//dac_ready = 0;
-			mem_state = 0;
+		/*if (itetot == 29980) begin
+			dac_ready = 0;
+			//mem_state = 0;
 			j = 0;
 			sel = 0;
 			change = 1;
@@ -232,9 +234,9 @@ initial begin
 			#20ns;
 			$display ("L'écart moyen entre la théorie et la valeur pratique est : ",moyenne);
 			#850ns;
-			//dac_ready = 1;
-			mem_state = 1;
-		end
+			dac_ready = 1;
+			//mem_state = 1;
+		end*/
 	end
 end
 endmodule

@@ -111,22 +111,22 @@ begin
 
 --*********************************************************************************
 
-	rst_IBB_QBB : process(resetn, c_state, temp_IBB, temp_QBB, en_10MHz, en_10MHz_prev)
+	rst_IBB_QBB : process(resetn, clk)
 	begin
 
 		if(resetn = '0') then
 			IBB <= (others => '0');
 			QBB <= (others => '0');
 		else
-
-			if(en_10MHz = '1' and en_10MHz_prev = '0') then
-				IBB    		<= temp_IBB;
-                QBB    		<= temp_QBB;
-			end if;
-
-			if(c_state = rst_state) then
-				IBB <= (others => '0');
-				QBB <= (others => '0');
+			if(rising_edge(clk)) then
+				if(en_10MHz = '1' and en_10MHz_prev = '0') then
+					IBB    		<= temp_IBB;
+                	QBB    		<= temp_QBB;
+				end if;
+				if(c_state = rst_state) then
+					IBB <= (others => '0');
+					QBB <= (others => '0');
+				end if;
 			end if;
 		end if;
 	end process rst_IBB_QBB;
@@ -154,7 +154,7 @@ begin
         case C_STATE is
             --*********************************************************************************
             when RST_STATE =>
-                if(mem_state = '1' and dac_ready = '1' and en = '0' and en_prev = '1') then
+                if(mem_state = '1' and dac_ready = '1' and en = '1') then
                     N_STATE <= INIT;
                 else
                     N_STATE <= RST_STATE;
@@ -170,7 +170,7 @@ begin
 					N_STATE <= RST_STATE;
 				end if;
 
-                if(cpt = x"4" and cpt_old = x"4" and en = '0' and en_prev = '1') then
+                if(cpt = x"4" and cpt_old = x"4" and en = '1') then
                 	N_STATE <= I;
                 else
                 	N_STATE <= INIT;
@@ -186,15 +186,11 @@ begin
 					N_STATE <= RST_STATE;
 				end if;
 				
-                if(cpt = x"0" and cpt_old = x"0" and en= '0' and en_prev = '1') then
-                    if(dac_ready = '0' or mem_state = '0') then
-                        N_STATE <= RST_STATE;
-                    else
-                        N_STATE <= Q;
-                    end if;
+                if(cpt = x"0" and cpt_old = x"0" and en = '1') then
+                    N_STATE <= Q;
                 else
-                    N_STATE <= I;
-                end if;
+                	N_STATE <= I;
+               	end if;
 
             --*********************************************************************************
             when Q =>
@@ -206,13 +202,9 @@ begin
 					N_STATE <= RST_STATE;
 				end if;
 
-                if(cpt = x"4" and cpt_old = x"4" and en = '0' and en_prev = '1') then
-                    if(mem_state = '0') then
-                        N_STATE <= RST_STATE;
-                    else
-                        N_STATE <= I;
-                    end if;
-                else
+                if(cpt = x"4" and cpt_old = x"4" and en = '1') then
+                    N_STATE <= I;
+				else
                     N_STATE <= Q;
                 end if;
 
@@ -340,6 +332,7 @@ begin
 		                        S_QBB    <= mem_array_Q(to_integer(unsigned(cpt)));
 		                    end if;   
 		                end if;
+
 						if(cpt = x"0" and en = '1') then
 							S_AQ_next	<= (b_in xor b_in_prev) xnor S_AQ;
 		                    S_AI_next	<= S_AI;
@@ -417,11 +410,12 @@ begin
 				end if;
 
             --*********************************************************************************              
-            when others => 	S_AQ_next	<= S_AQ;
-                        	S_AI_next	<= S_AI;
-							cpt_next 	<= cpt;
-							S_IBB		<= temp_IBB;
-							S_QBB		<= temp_QBB;
+            when others => 	
+					S_AQ_next	<= S_AQ;
+                    S_AI_next	<= S_AI;
+					cpt_next 	<= cpt;
+					S_IBB		<= temp_IBB;
+					S_QBB		<= temp_QBB;
 
             --********************************************************************************* 
         end case;
