@@ -4,5 +4,5 @@
 export PROJECT_LIBS_DIR=$(PROJECT_DIR)/libs
 
 # Modules directories
-export CORDIC_CDR_ASM_DIR=$(PROJECT_DIR)/modules/cordic_cdr_asm
 export CORDIC_DIR=$(PROJECT_DIR)/modules/cordic
+export CODIQ_DIR=$(PROJECT_DIR)/modules/codiq
