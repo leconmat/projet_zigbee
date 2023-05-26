@@ -19,7 +19,7 @@ module fsm (
 // et current_state permettent de connaitre l'état actuel et l'état suivant de la fsm.
 // La variable i permet de connaitre l'étape de calcul en cours du MAC.
 
-logic  [1:0] cosine_out_prev;
+logic  [1:0] sine_out_prev;
 logic [2:0] counter;
 
 typedef enum  {
@@ -57,40 +57,40 @@ always_comb
 	     unique case(current_state)
 		INIT:
 		     begin
-			cosine_out_prev = 2'b00; 
-			cosine_out = 2'b00;
+			sine_out_prev = 2'b00; 
 			sine_out = 2'b00;
+			cosine_out = 2'b00;
 			next_state = ONE;
 			end
 		ONE:
 		     begin
-			cosine_out = 2'b01;
-			sine_out = cosine_out_prev;
-			cosine_out_prev = cosine_out;
+			sine_out = 2'b01;
+			cosine_out = sine_out_prev;
+			sine_out_prev = sine_out;
 			next_state = TWO;
 			end
 
 		TWO:
 		     begin
-			cosine_out = 2'b00;
-			sine_out = cosine_out_prev;
-			cosine_out_prev = cosine_out;
+			sine_out = 2'b00;
+			cosine_out = sine_out_prev;
+			sine_out_prev = sine_out;
 			next_state = THREE;
 		     end
 			
 		THREE:
 		     begin
-			cosine_out = 2'b11;
-			sine_out = cosine_out_prev;
-			cosine_out_prev = cosine_out;
+			sine_out = 2'b11;
+			cosine_out = sine_out_prev;
+			sine_out_prev = sine_out;
 			next_state = FOUR;
 		     end
 			
 		FOUR:
 		     begin
-			cosine_out = 2'b00;
-			sine_out = cosine_out_prev;
-			cosine_out_prev = cosine_out;
+			sine_out = 2'b00;
+			cosine_out = sine_out_prev;
+			sine_out_prev = sine_out;
 			next_state = ONE;
 		     end
 
