@@ -5,18 +5,22 @@ module demodulation(
 	input logic clk,
 	input logic resetn,
 	input bit ADC_rdy,
-	input logic [6:0] I_IF,
-	input logic [6:0] Q_IF,
-	input logic [1:0] sine_in,
-	input logic [1:0] cosine_in,
-	output logic [8:0] I_BB,
-	output logic [8:0] Q_BB,
+	input logic signed [4:0] I_IF,
+	input logic signed [4:0] Q_IF,
+	input logic signed [1:0] sine_in,
+	input logic signed [1:0] cosine_in,
+	output logic signed [4:0] I_BB, 
+	output logic signed [4:0] Q_BB,
 	output bit demod_rdy
 );
-	logic [8:0] IS;
-	logic [8:0] IC;
-	logic [8:0] QS;
-	logic [8:0] QC;
+
+	logic signed [6:0] I_BB_f;
+	logic signed [6:0] Q_BB_f;
+	logic signed [6:0] IS;
+	logic signed [6:0] IC;
+	logic signed [6:0] QS;
+	logic signed [6:0] QC;
+
 
 	enable validation(	.clk(clk),
 				.resetn(resetn),
@@ -24,12 +28,12 @@ module demodulation(
 				.demod_rdy(demod_rdy)
 	);
 
-	fsm sincos (		.clk(clk),
+	/*fsm sincos (		.clk(clk),
 				.resetn(resetn),
 				.cosine_out(cosine_in),
 				.sine_out(sine_in)
 	);
-	/*always_ff @(posedge clk, negedge resetn)
+	always_ff @(posedge clk, negedge resetn)
 		begin
 			if (~resetn) 
 			begin
@@ -80,6 +84,9 @@ module demodulation(
 	assign IC = cosine_in * I_IF;
 	assign QS = sine_in * Q_IF;
 	assign QC = cosine_in * Q_IF;	
-	assign I_BB = IC - QS;
-	assign Q_BB = IS + QC;
+	assign I_BB_f = IC/*[6:2]*/ - QS/*[6:2]*/;
+	assign Q_BB_f = IS/*[6:2]*/ + QC/*[6:2]*/;
+	assign I_BB[4:0] = I_BB_f[6:2];
+	assign Q_BB[4:0] = Q_BB_f[6:2];
+
 endmodule
