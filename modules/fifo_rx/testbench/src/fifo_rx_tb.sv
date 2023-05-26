@@ -4,18 +4,15 @@ module fifo_rx_tb ();
 
 //System Inputs
 logic clk, reset_n, en_cdr;
-
 // APB signals
 logic data_in, psel, pwrite, penable, pready, pslverr,a;
-integer y = 0 ;
-integer j = 0 ;
-// Output Tx
+// Output Rx
 logic [7:0] prdata;
-reg mem_state; // 0 memoire vide, 1 memoire remplie ou partiellement remplie
 
 fifo_rx DUT(.clk(clk),.reset_n(reset_n), .en_cdr(en_cdr), 
 	    .data_in(data_in), .psel(psel), .pwrite(pwrite), .penable(penable), .pready(pready), .pslverr(pslverr),
-	    .prdata(prdata), .mem_state(mem_state));
+	    .prdata(prdata));
+
 
 	//reset
 	initial begin
@@ -24,7 +21,6 @@ fifo_rx DUT(.clk(clk),.reset_n(reset_n), .en_cdr(en_cdr),
 		reset_n = 1;
 		#20; 
 	end
-
 	// Write bench
 	initial begin
 		data_in = 0;
@@ -44,7 +40,6 @@ fifo_rx DUT(.clk(clk),.reset_n(reset_n), .en_cdr(en_cdr),
 			en_cdr = ~en_cdr;	
 		end
 	end
-
 	//Test Lecture
 	initial begin
 		prdata = 'h0;

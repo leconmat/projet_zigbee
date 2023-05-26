@@ -15,8 +15,7 @@ module fifo_rx
 					output logic pready,
 					output logic pslverr,
 					// Output Tx
-					output logic [WIDTH-1:0] prdata, 
-					output reg mem_state // 0 memoire vide, 1 memoire remplie ou partiellement remplie
+					output logic [WIDTH-1:0] prdata
 );
 
 
@@ -52,15 +51,6 @@ always_comb begin
 		full = 0;
 		empty = 0;
 	end
-end
-
-// Memory state logic 
-always_comb begin 
-	if (full == 1'b1) begin
-		mem_state = 1'b1; // Memoire vide 
-	end
-	else
-		mem_state = 1'b0;
 end
 
 // APB Error logic
