@@ -7,7 +7,7 @@ module tbench_filtre_bis ();
 
 	bit clk = 1'b1;
 	bit reset;        
-	bit in_valid, pret;
+	bit in_valid;
 	bit out_valid_I, out_valid_Q;
 
 	logic [4:0] filter_in_I_digital;
@@ -38,7 +38,6 @@ module tbench_filtre_bis ();
 		.resetn(reset),
 		.data_in(filter_in_I_digital),
 		.in_valid(in_valid),
-		.pret(),
 		.out_valid(out_valid_I),
 		.data_out(filter_out_I_digital)
 	);
@@ -47,10 +46,10 @@ module tbench_filtre_bis ();
 		.resetn(reset),
 		.data_in(filter_in_Q_digital),
 		.in_valid(in_valid),
-		.pret(),
 		.out_valid(out_valid_Q),
 		.data_out(filter_out_Q_digital)
 	);
+
 
 	always #10 clk = ~clk; //période 20 ns = 50Mhz
 
@@ -85,6 +84,9 @@ module tbench_filtre_bis ();
 			filter_in_I_digital = integer'(filter_in_I_real / quantum);
 			filter_in_Q_digital = integer'(filter_in_Q_real / quantum);
 
+			//filter_in_I_digital = sample_t'(filter_in_I_real / quantum);
+			//filter_in_Q_digital = sample_t'(filter_in_Q_real / quantum);
+
 			matlab_in_I_digital = sample_t'(matlab_in_I_real / quantum);
 			matlab_in_Q_digital = sample_t'(matlab_in_Q_real / quantum);
 
@@ -109,17 +111,20 @@ module tbench_filtre_bis ();
 			$fscanf(fd_I_out, "%f\n", matlab_out_I_real);
 
 			//matlab_out_I_real = matlab_out_I_real / quantum;
+			temp_error_I = matlab_out_I_real - filter_out_I_real;
 
-			out_error_I = matlab_out_I_real - filter_out_I_digital;
+			
 		end
 
 		if(out_valid_Q)
 		begin
 			$fscanf(fd_Q_out, "%f\n", matlab_out_Q_real);
-
 			//matlab_out_Q_real = matlab_out_Q_real / quantum;
-
-			out_error_Q = matlab_out_Q_real - filter_out_Q_digital;
+			temp_error_Q_positif = matlab_out_Q_real - filter_out_Q_real;
+			temp_error_Q_negatif = filter_out_Q_real - matlab_out_Q_real;
+				if (temp_error_Q_positif > temp_error_Q_negatif) out_error_Q = temp_error_Q_negatif;
+				else out_error_Q = temp_error_Q_positif;		 	  
+	
 		end
 	end
 	
