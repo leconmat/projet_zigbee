@@ -56,10 +56,10 @@ end
 // Memory state logic 
 always_comb begin 
 	if (full == 1'b1) begin
-		mem_state = 1'b0; // Memoire vide 
+		mem_state = 1'b1; // Memoire vide 
 	end
 	else
-		mem_state = 1'b1;
+		mem_state = 1'b0;
 end
 
 // APB Error logic
