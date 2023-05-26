@@ -47,6 +47,7 @@ fifo_rx DUT(.clk(clk),.reset_n(reset_n), .en_cdr(en_cdr),
 
 	//Test Lecture
 	initial begin
+		prdata = 'h0;
 		psel = 1'b0;
 		pwrite = 1'b0;
 		penable = 1'b0;

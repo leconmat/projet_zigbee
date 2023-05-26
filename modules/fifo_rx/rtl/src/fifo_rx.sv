@@ -32,8 +32,9 @@ logic [PTR_WIDTH:0] wr_ptr, rd_ptr;
 logic full;  
 logic empty; 
 reg [7:0] shift_register;
-reg [WIDTH-1:0] i = 0;
+reg [WIDTH-1:0] i;
 reg en_cdr_prec;
+
 assign pready = 1'b1;
 
 
@@ -87,6 +88,7 @@ assign wr_en = !en_cdr_prec && en_cdr && !full ;
 always @(posedge clk, negedge reset_n) begin
 	if (!reset_n) begin
 		shift_register <= 8'b00000000;
+		i <=0;
 	end
 	else begin
 		if (i >= WIDTH)
