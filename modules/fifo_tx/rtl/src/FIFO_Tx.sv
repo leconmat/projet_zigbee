@@ -80,12 +80,6 @@ end
 assign pready = 1;
 assign wr_en = psel && penable && pwrite && !full;
 
-typedef enum logic {
-    Idle_Write,
-    Write
-    } fsm_wr;
-fsm_wr state_wr, next_state_wr;
-
 always_ff @(posedge clk, negedge reset_n) begin
 	if (~reset_n)
 		for(integer i = 0; i < DEPTH; i++)
