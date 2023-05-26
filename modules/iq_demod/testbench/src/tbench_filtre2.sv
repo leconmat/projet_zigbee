@@ -29,9 +29,9 @@ module tbench_filtre_bis ();
 	
 	integer fd_I_in, fd_I_out, fd_Q_in, fd_Q_out;
 
-	real out_error_I, out_error_Q;
+	real out_error_I, out_error_Q, temp_error_Q_positif,temp_error_Q_negatif, temp_error_I;
 
-	sin_wave sinus(1,  filter_in_I_real);
+	sin_wave sinus1(750,  filter_in_I_real);
 
 	 // connexion avec le filtre
 	filter dut_I (.clk(clk),         
