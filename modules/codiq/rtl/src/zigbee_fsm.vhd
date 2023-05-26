@@ -48,6 +48,7 @@ architecture Behavioral of zigbee_fsm is
     signal S_AQ_next   : std_logic;  	           		-- signal temporaire Aq suivant
 
 	signal f_dac_down  : std_logic;						-- flag d etat bas du dac
+	signal f_temp_dac  : std_logic;
 
     signal mem_array_I 		: mem_t_I;					-- rom memoire I
     signal mem_array_Q 		: mem_t_Q;					-- rom memoire Q
@@ -81,11 +82,13 @@ begin
 		if(resetn = '0') then
 			ready <= '0';
 		else
-			if(rising_edge(clk)) then	 
-				if(dac_ready = '1' and f_dac_down = '0') then
-					ready   <= '1';
-				else
-					ready   <= '0';
+			if(rising_edge(clk)) then
+				if(en_10MHz = '1' and en_10MHz_prev = '0') then
+					if(dac_ready = '1' and f_dac_down = '0') then
+						ready   <= '1';
+					else
+						ready   <= '0';
+					end if;
 				end if;
 			end if;
 		end if;
@@ -94,13 +97,21 @@ begin
 	assign_dac_down : process(resetn, clk)
 	begin
 		if(resetn = '0') then
-			f_dac_down <= '0';
+			f_dac_down <= '1';
+			f_temp_dac <= '0';
 		else
-			if(rising_edge(clk)) then	 
+			if(rising_edge(clk)) then
+				
 				if(dac_ready = '0') then
 					f_dac_down <= '1';
+					if(f_dac_down = '0') then
+						f_temp_dac <= '1';
+					end if;
+					if(f_dac_down = '1') then
+						f_temp_dac <= '0';
+					end if;
 				else
-				    if(dac_ready = '1' and ((cpt = x"4" and cpt_old = x"3") or (cpt = x"0" and cpt_old = x"1"))) then
+				    if(dac_ready = '1' and ((cpt = x"4" and cpt_old = x"3") or (cpt = x"0" and cpt_old = x"1") or (cpt = x"0" and cpt_old = x"0"))) then
 					   f_dac_down <= '0';
 					end if;
 				end if;
@@ -111,34 +122,40 @@ begin
     assign : process (clk, resetn) -- permet le passage du current state au next state et la reception de l etat reset
     begin
         if(resetn = '0') then -- reset actif a 0
-            en_10MHz_prev 	<= '0';
-            en_prev   		<= '0';
-            cpt 			<= (others => '0');
-            S_AI      		<= '0';
-            S_AQ      		<= '1';
-			temp_IBB 		<= (others => '0');
-            temp_QBB 		<= (others => '0');		
-            b_in_prev       <= '0';
-            s_b_in_prev		<= '0';
-            cpt_old 		<= (others => '0');
+            en_10MHz_prev 		<= '0';
+            en_prev   			<= '0';
+            cpt 				<= (others => '0');
+            S_AI      			<= '0';
+            S_AQ      			<= '1';
+			temp_IBB 			<= (others => '0');
+            temp_QBB 			<= (others => '0');		
+            b_in_prev       	<= '0';
+            s_b_in_prev			<= '0';
+            cpt_old 			<= (others => '0');
 
         else
             if(rising_edge(clk)) then
-                en_10MHz_prev	<= en_10MHz;
-                en_prev 		<= en;
-				temp_IBB		<= S_IBB;
-				temp_QBB		<= S_QBB;
-
+                en_10MHz_prev		<= en_10MHz;
+                en_prev 			<= en;
+				temp_IBB			<= S_IBB;
+				temp_QBB			<= S_QBB;
+				if(f_dac_down = '1' and c_state = Q and f_temp_dac = '1') then
+					cpt   			<= std_logic_vector(unsigned(cpt)+1);
+				else
+					if(f_dac_down = '1' and c_state = I and f_temp_dac = '1') then
+						cpt   		<= std_logic_vector(unsigned(cpt)-1);
+					end if;
+				end if;
                 if(en_10MHz = '1' and en_10MHz_prev = '0') then                    
-			        cpt 		<= cpt_next;
-                    cpt_old 	<= cpt;
-					b_in_prev 	<= s_b_in_prev;
+			        cpt 			<= cpt_next;
+                    cpt_old 		<= cpt;
+					b_in_prev 		<= s_b_in_prev;
                 end if;
 
                 if(en = '1' and en_prev = '0') then
-                    s_b_in_prev <= b_in;
-		    		S_AI    	<= S_AI_next;
-                    S_AQ    	<= S_AQ_next;
+                    s_b_in_prev 	<= b_in;
+		    		S_AI    		<= S_AI_next;
+                    S_AQ    		<= S_AQ_next;
                 end if;	
             end if;
         end if;
@@ -148,7 +165,6 @@ begin
 	begin
 		if(resetn = '0') then -- reset actif a 0
             en_dac <= '0';
-
         else
             if(rising_edge(clk)) then
 				if(en_10MHz = '1') then           
@@ -205,7 +221,7 @@ begin
         case C_STATE is
             --*********************************************************************************
             when RST_STATE =>
-                if(mem_state = '1' and dac_ready = '1' and en = '1') then
+                if(mem_state = '1' and dac_ready = '1' and en = '1' and en_prev = '0') then
                     N_STATE <= INIT;
                 else
                     N_STATE <= RST_STATE;
@@ -219,13 +235,14 @@ begin
 				
 				if(cpt = x"4" and cpt_old = x"4" and mem_state = '0') then
 					N_STATE <= RST_STATE;
-				end if;
+				else
 
-                if(cpt = x"4" and cpt_old = x"4" and en = '1') then
-                	N_STATE <= I;
-                else
-                	N_STATE <= INIT;
-                end if;
+                	if(cpt = x"4" and cpt_old = x"4" and en = '1') then
+                		N_STATE <= I;
+                	else
+                		N_STATE <= INIT;
+                	end if;
+				end if;
 
             --*********************************************************************************
             when I =>
@@ -235,13 +252,14 @@ begin
 
 				if(cpt = x"0" and cpt_old = x"0" and mem_state = '0') then
 					N_STATE <= RST_STATE;
-				end if;
+				else
 				
-                if(cpt = x"0" and cpt_old = x"0" and en = '1') then
-                    N_STATE <= Q;
-                else
-                	N_STATE <= I;
-               	end if;
+                	if(cpt = x"0" and cpt_old = x"0" and en = '1') then
+                    	N_STATE <= Q;
+                	else
+                		N_STATE <= I;
+               		end if;
+				end if;
 
             --*********************************************************************************
             when Q =>
@@ -251,12 +269,13 @@ begin
 
 				if(cpt = x"4" and cpt_old = x"4" and mem_state = '0') then
 					N_STATE <= RST_STATE;
-				end if;
-
-                if(cpt = x"4" and cpt_old = x"4" and en = '1') then
-                    N_STATE <= I;
 				else
-                    N_STATE <= Q;
+
+                	if(cpt = x"4" and cpt_old = x"4" and en = '1') then
+                    	N_STATE <= I;
+					else
+                   		N_STATE <= Q;
+					end if;
                 end if;
 
             --*********************************************************************************              

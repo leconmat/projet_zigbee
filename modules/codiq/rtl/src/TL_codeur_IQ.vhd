@@ -14,6 +14,7 @@ entity TL_codeur_IQ is
    dac_ready    : in   std_logic;					 -- signal d'etat ready du DAC (ready a '1')
    IBB          : out  std_logic_vector(3 downto 0); -- sortie IBB
    QBB          : out  std_logic_vector(3 downto 0); -- sortie QBB
+   en_dac		: out  std_logic;
    ready        : out  std_logic					 -- signal ready a envoyer a la fifo
    );
 end TL_codeur_IQ;
@@ -30,9 +31,10 @@ component zigbee_fsm is
 	 en           : in   std_logic; 				   -- signal enable 2 MHz reçu depuis le bloc FIFO a chaque envoi de bit de data b_in
 	 b_in         : in   std_logic;                    -- data reçue bit a bit via la FIFO
      resetn       : in   std_logic; 				   -- reset actif a 0
-	 mem_state    : in   std_logic; -- signal 2 bits provenant de la FIFO indiquant si leur memoire est vide ou pas ("01" memoire vide)
-	 dac_ready    : in   std_logic;		 -- signal d'etat ready du DAC (ready a '1')
-	ready		 : out  std_logic;				  
+	 mem_state    : in   std_logic; 				   -- signal 2 bits provenant de la FIFO indiquant si leur memoire est vide ou pas ("01" memoire vide)
+	 dac_ready    : in   std_logic;		 	  		   -- signal d'etat ready du DAC (ready a '1')
+	 ready		  : out  std_logic;
+	 en_dac		  : out  std_logic;		  
      IBB          : out  std_logic_vector(3 downto 0); -- sortie I
 	 QBB          : out  std_logic_vector(3 downto 0)  -- sortie Q
     );
@@ -40,7 +42,7 @@ end component;
 
 component en_gen is
     port (
-	resetn  : in  std_logic;
+		resetn  : in  std_logic;
         clk_in  : in  std_logic;
         clk_out : out std_logic
     );
@@ -66,7 +68,8 @@ fsm_mapping : zigbee_fsm -- port map du bloc fsm
 	 dac_ready  => dac_ready,
      IBB        => IBB,
 	 QBB        => QBB,
-	ready	=> ready
+	 en_dac		=> en_dac,
+	 ready		=> ready
     );
 	
 en_gen_map : en_gen -- port map du bloc gen_enable
@@ -76,7 +79,6 @@ en_gen_map : en_gen -- port map du bloc gen_enable
 	 clk_in	  => clk,
 	 clk_out  => en_10MHz
 	 );
-	 
-	  
+	   
 end TL_codeur_IQ_arch;
 	 
