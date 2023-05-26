@@ -15,7 +15,10 @@ module FIFO_TX_TB;
 	wire IQ_rate;
 	reg  mem_state;
 	reg [7:0] decoded_data;
-	reg decoded_pulse;	
+	reg decoded_pulse;
+
+	bit [7:0] sentData[$];	
+
 	// parameter DEPTH = 8;
 	// Instanciation nom du module + instance du module
 	FIFO_Tx FIFO_TX_inst(	
@@ -50,7 +53,7 @@ end
 always begin 
 	for(integer j = 0 ; j < 64 ; j++) begin
 		 @(posedge decoded_pulse);
-		 if(decoded_data != j)
+		 if(decoded_data != sentData.pop_front())
 			$display("Invalid data");
 		else
 			$display("Good data!");
@@ -67,30 +70,66 @@ initial begin
 		reset_n = 0;
 		#20;
 		reset_n = 1;
-		
-// Ecriture normale 
-	   	psel = 1'b1;
+		#20;
+// Fonctionnement basique : validé 
+/*	   	psel = 1'b1;
 	   	pwrite = 1'b1;
 	   	penable = 1'b1;
 	   			
 		for(integer i = 0 ; i < 64 ; i++) begin 
 			pwdata <= i;
+			sentData.push_back(i);
 			#20;
 		end
 		penable = 1'b0;
-// Lecture normale
 		#20;
 		en_IQ = 1'b1;  
+		$display("Donnée lue : %h", data_out);*/
+
+// Fonctionnement en continu
+		@(posedge clk); 
+		psel = 1'b1;
+	   	pwrite = 1'b1;
+	   	penable = 1'b1;	
+		for(integer i = 0 ; i < 64 ; i++) begin 
+			pwdata <= i;
+			sentData.push_back(i);
+			#20;
+		end
+		#20;
+		penable = 1'b0;
+		#100;
+		en_IQ = 1'b1;  
+		#350000;
+		//penable = 1'b0;
+	   	penable = 1'b1;
+		for(integer i = 64 ; i < 128 ; i++) begin 
+			pwdata <= i;
+			sentData.push_back(i);
+			#20;
+		end
+		#20;
+		penable = 1'b0;
+		#100;
 		$display("Donnée lue : %h", data_out);
-	
-// Lecture depuis une FIFO vide
+
+// Lecture depuis une FIFO vide : validé
 		/*pwdata = 8'b00000000;
 		en_IQ = 1'b1;
 		#10;
 		$display("Donnée lue : %h", data_out);*/
 
-// Test APB 
-
+// Test APB : validé
+/*		@(posedge clk); 
+		psel = 1'b1;
+	   	pwrite = 1'b0;
+	   	penable = 1'b1;	
+		for(integer i = 0 ; i < 64 ; i++) begin 
+			pwdata <= i;
+			sentData.push_back(i);
+			#20;
+		end*/
+	
 // Ecriture dans une mémoire pleine 
 		
 	

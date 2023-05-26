@@ -20,6 +20,7 @@ module FIFO_Tx #(
 );
 
 ////// Internal signals
+logic wr_en, rd_en;
 // Memory signals 
 parameter PTR_WIDTH = $clog2(DEPTH);
 logic [WIDTH-1:0] mem [DEPTH-1:0] ;
@@ -31,7 +32,7 @@ logic empty;
 // Rate change counters 50 MHz -> 2 MHz
 reg [4:0] counter_clock;
 reg [2:0] compteur;
-logic load;
+//logic load;
 
 // PISO Instantiation
 //PISO PISO_FIFO (.clk(clk), .parallel_in(mem[rd_ptr]), .load(load), .serial_out(data_out)); 
@@ -84,13 +85,13 @@ end
 assign pready = 1;
 assign wr_en = psel && penable && pwrite && !full;
 
-/*typedef enum logic {
+typedef enum logic {
     Idle_Write,
     Write
     } fsm_wr;
 fsm_wr state_wr, next_state_wr;
 
-always_ff @(posedge clk, negedge reset_n) 
+/*always_ff @(posedge clk, negedge reset_n) 
 begin
 	if (~reset_n) 
 	    state_wr <= Idle_Write;
@@ -119,24 +120,24 @@ always_comb begin
 	endcase
 end 
 
-always_comb begin 
+/*always_comb begin 
 	unique case(state_wr)
 		Idle_Write: begin
-			mem[wr_ptr] = mem[wr_ptr];
+			mem[wr_ptr[PTR_WIDTH-1:0]] = mem[wr_ptr[PTR_WIDTH-1:0]];
 		end
 		Write: begin
-			mem[wr_ptr] = pwdata;
+			mem[wr_ptr[PTR_WIDTH-1:0]] = pwdata;
 		end
 	endcase
-end */
+end*/
 
 
 always_ff @(posedge clk) begin
 	if(wr_en)
-		mem[wr_ptr] <= pwdata;
+		mem[wr_ptr[PTR_WIDTH-1:0]] <= pwdata;
 	else
-		mem[wr_ptr] <= mem[wr_ptr];
-end	
+		mem[wr_ptr[PTR_WIDTH-1:0]] <= mem[wr_ptr[PTR_WIDTH-1:0]];
+end
 
 // Write pointer logic
 always_ff @(posedge clk, negedge reset_n) begin
@@ -204,26 +205,10 @@ always_comb begin
 			data_out = 'b0; 
 		end
 		Read : begin 
-			data_out = mem[rd_ptr][compteur];
+			data_out = mem[rd_ptr[PTR_WIDTH-1:0]][compteur];
 		end
 	endcase		
 end
-
-// Read pointer logic
-/*always_ff @(posedge clk, negedge reset_n) begin
-	if(~reset_n) begin
-		rd_ptr <= 'h0;
-	end
-	else begin
-		if (rd_en) begin
-			if (compteur == 0) begin
-				rd_ptr <= rd_ptr + 1;
-			end
-		end
-		else
-			rd_ptr <= rd_ptr;
-	end
-end */
 
 // Output generation at 2MHz
 always @(posedge clk, negedge reset_n) begin 
@@ -243,6 +228,7 @@ always @(posedge clk, negedge reset_n) begin
 			counter_clock <= 'b0;
 			if(compteur == 7) begin
 				compteur <= 'b0;
+				
 				rd_ptr <= rd_ptr + 1;
 			end
 			else
@@ -257,9 +243,7 @@ always @(posedge clk, negedge reset_n) begin
 		IQ_rate <= 0;
 	end
 end 
-
 /////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////// END READ LOGIC //////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////
-endmodule    
-
+endmodule 
