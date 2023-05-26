@@ -51,18 +51,16 @@ always begin
 end
 
 always begin 
-	for(integer j = 0 ; j < 64 ; j++) begin
-		 @(posedge decoded_pulse);
-		 if(decoded_data != sentData.pop_front())
-			$display("Invalid data");
-		else
-			$display("Good data!");
-	end
+	 @(posedge decoded_pulse);
+	 if(decoded_data != sentData.pop_front())
+		$display("Invalid data");
+	else
+		$display("Good data!");
+
 end
 
 
 initial begin
-		en_IQ = 0;
 		pwdata = 8'b00000000;	
 		psel = 1'b0;
 	   	pwrite = 1'b0;
@@ -71,23 +69,20 @@ initial begin
 		#20;
 		reset_n = 1;
 		#20;
-// Fonctionnement basique : validé 
-/*	   	psel = 1'b1;
+		psel = 1'b1;
 	   	pwrite = 1'b1;
-	   	penable = 1'b1;
-	   			
-		for(integer i = 0 ; i < 64 ; i++) begin 
-			pwdata <= i;
-			sentData.push_back(i);
-			#20;
-		end
-		penable = 1'b0;
-		#20;
-		en_IQ = 1'b1;  
-		$display("Donnée lue : %h", data_out);*/
 
-// Fonctionnement en continu
-		@(posedge clk); 
+		for(integer i = 0 ; i < 64 ; i++) begin
+			penable = 1'b1;
+			pwdata <= $urandom ;
+			sentData.push_back(pwdata);
+			#20;
+			penable = 1'b0;
+			#20000;
+		end
+
+// Fonctionnement basique : validé 
+/*		@(posedge clk); 
 		psel = 1'b1;
 	   	pwrite = 1'b1;
 	   	penable = 1'b1;	
@@ -111,8 +106,7 @@ initial begin
 		#20;
 		penable = 1'b0;
 		#100;
-		$display("Donnée lue : %h", data_out);
-
+		$display("Donnée lue : %h", data_out); */
 // Lecture depuis une FIFO vide : validé
 		/*pwdata = 8'b00000000;
 		en_IQ = 1'b1;
@@ -135,16 +129,13 @@ initial begin
 	
 	
 end
+initial begin
+// Fonctionnement en continu 
+		en_IQ = 0;
+		#200;
+		en_IQ = 1;
+		$display("Donnée lue : %h", data_out);
   	 
-	  // Affichage des valeurs de sortie
-	  /*always @(posedge clk) begin
-		if (PREADY) begin
-			$display("Data Out: %h", data_out);
-		  	$display("IQ Rate: %b", IQ_rate);
-		  	$display("Memory State: %b", mem_state);
-		end
-		// Terminer la simulation
-		$finish;
-	  end*/
+end
 	
 endmodule

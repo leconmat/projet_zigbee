@@ -32,16 +32,11 @@ logic empty;
 // Rate change counters 50 MHz -> 2 MHz
 reg [4:0] counter_clock;
 reg [2:0] compteur;
-//logic load;
-
-// PISO Instantiation
-//PISO PISO_FIFO (.clk(clk), .parallel_in(mem[rd_ptr]), .load(load), .serial_out(data_out)); 
-
-
 
 /////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////// BEGIN MEMORY LOGIC ////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////
+
 always_comb begin
 	if((wr_ptr[PTR_WIDTH-1:0]) == (rd_ptr[PTR_WIDTH-1:0])) begin
 		full = (wr_ptr[PTR_WIDTH]) ^ (rd_ptr[PTR_WIDTH]); // carry différent => full 
@@ -91,49 +86,11 @@ typedef enum logic {
     } fsm_wr;
 fsm_wr state_wr, next_state_wr;
 
-/*always_ff @(posedge clk, negedge reset_n) 
-begin
-	if (~reset_n) 
-	    state_wr <= Idle_Write;
-    else 
-	    state_wr <= next_state_wr;
-end
-
-
-always_comb begin
-	unique case (state_wr)
-		Idle_Write: begin
-			if (wr_en)
-				next_state_wr = Write;
-			else
-				next_state_wr = Idle_Write;
-		end
-		Write: begin
-			if (wr_en)
-				next_state_wr = Write;
-			else
-				next_state_wr = Idle_Write;
-		end
-		 default : begin
-			next_state_wr = Idle_Write;
-		end 
-	endcase
-end 
-
-/*always_comb begin 
-	unique case(state_wr)
-		Idle_Write: begin
-			mem[wr_ptr[PTR_WIDTH-1:0]] = mem[wr_ptr[PTR_WIDTH-1:0]];
-		end
-		Write: begin
-			mem[wr_ptr[PTR_WIDTH-1:0]] = pwdata;
-		end
-	endcase
-end*/
-
-
-always_ff @(posedge clk) begin
-	if(wr_en)
+always_ff @(posedge clk, negedge reset_n) begin
+	if (~reset_n)
+		for(integer i = 0; i < DEPTH; i++)
+			mem[i] <= 0;
+	else if(wr_en)
 		mem[wr_ptr[PTR_WIDTH-1:0]] <= pwdata;
 	else
 		mem[wr_ptr[PTR_WIDTH-1:0]] <= mem[wr_ptr[PTR_WIDTH-1:0]];
@@ -243,7 +200,7 @@ always @(posedge clk, negedge reset_n) begin
 		IQ_rate <= 0;
 	end
 end 
-/////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////// END READ LOGIC //////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////// END READ LOGIC ///////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
 endmodule 
