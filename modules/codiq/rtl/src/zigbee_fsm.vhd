@@ -8,71 +8,106 @@ use IEEE.NUMERIC_STD.ALL;
 entity zigbee_fsm is
     port
 (
-        clk	      : in   std_logic;					   -- signal de clk 50 MHz 
-        en_10MHz     : in   std_logic; 			       -- signal enable 10 MHz servant de clk genere par la clk 50 MHz dans le bloc en_gen.vhd
-        en           : in   std_logic; 				   -- signal enable 2 MHz reçu depuis le bloc FIFO a chaque envoi de bit de data b_in
-        b_in         : in   std_logic;                    -- data recue bit a bit via la FIFO
-        resetn       : in   std_logic; 				   -- reset actif a 0
-        mem_state    : in   std_logic; 			-- signal 2 bits provenant de la FIFO indiquant si leur memoire est vide ou pas ("01" memoire vide)
-        dac_ready    : in   std_logic;					   -- signal d etat ready du DAC (ready a  1 )
-        IBB          : out  std_logic_vector(3 downto 0); -- sortie I
-        QBB          : out  std_logic_vector(3 downto 0)  -- sortie Q
+        clk         : in   std_logic;					 -- signal de clk 50 MHz 
+        en_10MHz    : in   std_logic; 			         -- signal enable 10 MHz servant de clk genere par la clk 50 MHz dans le bloc en_gen.vhd
+        en          : in   std_logic; 				     -- signal enable 2 MHz reçu depuis le bloc FIFO a chaque envoi de bit de data b_in
+        b_in        : in   std_logic;                    -- data recue bit a bit via la FIFO
+        resetn      : in   std_logic; 				     -- reset actif a 0
+        mem_state   : in   std_logic; 					 -- signal 2 bits provenant de la FIFO indiquant si leur memoire est vide ou pas ("01" memoire vide)
+        dac_ready   : in   std_logic;					 -- signal d etat ready du DAC
+		ready       : out  std_logic;					 -- signal ready envoye a la fifo lorsque le dac est ready
+		en_dac		: out  std_logic;					 -- signal en envoye au dac en synchronisation avec chaque valeur IBB/QBB envoyees
+        IBB         : out  std_logic_vector(3 downto 0); -- sortie I
+        QBB         : out  std_logic_vector(3 downto 0)  -- sortie Q
     );
 end zigbee_fsm;
 
 architecture Behavioral of zigbee_fsm is
 
-    type StateType is (RST_STATE, INIT, I, Q);
-    type mem_t_I is array(4 downto 0) of std_logic_vector(3 downto 0);
-    type mem_t_Q is array(4 downto 0) of std_logic_vector(3 downto 0);
+    type StateType is (RST_STATE, INIT, I, Q); -- etats de la fsm
+    type mem_t_I is array(4 downto 0) of std_logic_vector(3 downto 0); -- rom I
+    type mem_t_Q is array(4 downto 0) of std_logic_vector(3 downto 0); -- rom Q
 
-    signal C_STATE     : StateType;        	 -- etat actuel (current state)
-    signal N_STATE     : StateType;          -- etat suivant (next state)
+    signal C_STATE     : StateType;        	 			-- etat actuel (current state)
+    signal N_STATE     : StateType;          			-- etat suivant (next state)
 
-    signal cpt_old  : std_logic_vector(2 downto 0);	-- variable precedente compteur
-    signal cpt      : std_logic_vector(2 downto 0);	-- variable d increment compteur
-    signal cpt_next : std_logic_vector(2 downto 0);	-- variable suivante d increment compteur
+    signal cpt_old  : std_logic_vector(2 downto 0);		-- variable precedente compteur
+    signal cpt      : std_logic_vector(2 downto 0);		-- variable d increment compteur
+    signal cpt_next : std_logic_vector(2 downto 0);		-- variable suivante d increment compteur
 
-    signal S_IBB       : std_logic_vector(3 downto 0); -- variable temporaire pour IBB
-    signal S_QBB       : std_logic_vector(3 downto 0); -- variable temporaire pour QBB
-	signal temp_IBB    : std_logic_vector(3 downto 0); -- variable temporaire pour IBB
-    signal temp_QBB    : std_logic_vector(3 downto 0); -- variable temporaire pour QBB
-    signal S_AI        : std_logic;  	           -- signal temporaire Ai
-    signal S_AQ        : std_logic;  	           -- signal temporaire Aq
+    signal S_IBB       : std_logic_vector(3 downto 0); 	-- variable temporaire pour IBB
+    signal S_QBB       : std_logic_vector(3 downto 0); 	-- variable temporaire pour QBB
+	signal temp_IBB    : std_logic_vector(3 downto 0); 	-- variable temporaire pour IBB
+    signal temp_QBB    : std_logic_vector(3 downto 0); 	-- variable temporaire pour QBB
+    signal S_AI        : std_logic;  	           		-- signal temporaire Ai
+    signal S_AQ        : std_logic;  	           		-- signal temporaire Aq
 
-    signal b_in_prev   : std_logic;	           -- stockage signal b_in	
+    signal b_in_prev   : std_logic;	           			-- stockage signal b_in	
 
-    signal S_AI_next   : std_logic :='0';  	           -- signal temporaire Ai suivant
-    signal S_AQ_next   : std_logic :='1';  	           -- signal temporaire Aq suivant
+    signal S_AI_next   : std_logic;  	           		-- signal temporaire Ai suivant
+    signal S_AQ_next   : std_logic;  	           		-- signal temporaire Aq suivant
 
+	signal f_dac_down  : std_logic;						-- flag d etat bas du dac
 
+    signal mem_array_I 		: mem_t_I;					-- rom memoire I
+    signal mem_array_Q 		: mem_t_Q;					-- rom memoire Q
 
-    signal mem_array_I 		: mem_t_I;
-    signal mem_array_Q 		: mem_t_Q;
+    signal en_prev			: std_logic;				-- valeur precedente enable
+    signal en_10MHz_prev    : std_logic;				-- valeur precedente enable 10 MHz
 
-    signal en_prev			: std_logic;
-    signal en_10MHz_prev    : std_logic;
-
-    signal s_b_in_prev : std_logic;
+    signal s_b_in_prev 		: std_logic;				-- signal d assignation de b_in_prev
 
 
 begin
 
     -- ******** affectation signaux ********
 
-    mem_array_I(0) <= "0111";
-    mem_array_I(1) <= "0110";
-    mem_array_I(2) <= "0101";
-    mem_array_I(3) <= "0011";
-    mem_array_I(4) <= "0001";
+    mem_array_I(0) <= "0111"; -- 7
+    mem_array_I(1) <= "0110"; -- 6
+    mem_array_I(2) <= "0101"; -- 5
+    mem_array_I(3) <= "0011"; -- 3
+    mem_array_I(4) <= "0001"; -- 1
 
-    mem_array_Q(0) <= "0001";
-    mem_array_Q(1) <= "0011";
-    mem_array_Q(2) <= "0101";
-    mem_array_Q(3) <= "0110";
-    mem_array_Q(4) <= "0111";
+    mem_array_Q(0) <= "0001"; -- 1
+    mem_array_Q(1) <= "0011"; -- 3
+    mem_array_Q(2) <= "0101"; -- 5
+    mem_array_Q(3) <= "0110"; -- 6
+    mem_array_Q(4) <= "0111"; -- 7
 
     --************************************************************************************************************************************************
+
+	assign_ready : process(resetn, clk)
+	begin
+		if(resetn = '0') then
+			ready <= '0';
+		else
+			if(rising_edge(clk)) then	 
+				if(dac_ready = '1' and f_dac_down = '0') then
+					ready   <= '1';
+				else
+					ready   <= '0';
+				end if;
+			end if;
+		end if;
+	end process;
+	
+	assign_dac_down : process(resetn, clk)
+	begin
+		if(resetn = '0') then
+			f_dac_down <= '0';
+		else
+			if(rising_edge(clk)) then	 
+				if(dac_ready = '0') then
+					f_dac_down <= '1';
+				else
+				    if(dac_ready = '1' and ((cpt = x"4" and cpt_old = x"3") or (cpt = x"0" and cpt_old = x"1"))) then
+					   f_dac_down <= '0';
+					end if;
+				end if;
+			end if;
+		end if;
+	end process;
+
     assign : process (clk, resetn) -- permet le passage du current state au next state et la reception de l etat reset
     begin
         if(resetn = '0') then -- reset actif a 0
@@ -109,6 +144,22 @@ begin
         end if;
     end process assign;
 
+	en_dac_assign : process (clk, resetn)
+	begin
+		if(resetn = '0') then -- reset actif a 0
+            en_dac <= '0';
+
+        else
+            if(rising_edge(clk)) then
+				if(en_10MHz = '1') then           
+					en_dac <= '1';
+				else
+					en_dac <= '0';
+				end if;
+			end if;
+		end if;
+	end process en_dac_assign;
+				
 --*********************************************************************************
 
 	rst_IBB_QBB : process(resetn, clk)

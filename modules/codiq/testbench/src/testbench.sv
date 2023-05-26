@@ -224,7 +224,7 @@ initial begin
 			vali = 0;
 			valq = 0;
 		end
-		/*if (itetot == 29980) begin
+		if (itetot == 29980) begin
 			dac_ready = 0;
 			//mem_state = 0;
 			j = 0;
@@ -236,7 +236,7 @@ initial begin
 			#850ns;
 			dac_ready = 1;
 			//mem_state = 1;
-		end*/
+		end
 	end
 end
 endmodule

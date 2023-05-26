@@ -31,7 +31,8 @@ component zigbee_fsm is
 	 b_in         : in   std_logic;                    -- data reçue bit a bit via la FIFO
      resetn       : in   std_logic; 				   -- reset actif a 0
 	 mem_state    : in   std_logic; -- signal 2 bits provenant de la FIFO indiquant si leur memoire est vide ou pas ("01" memoire vide)
-	 dac_ready    : in   std_logic;					   -- signal d'etat ready du DAC (ready a '1')
+	 dac_ready    : in   std_logic;		 -- signal d'etat ready du DAC (ready a '1')
+	ready		 : out  std_logic;				  
      IBB          : out  std_logic_vector(3 downto 0); -- sortie I
 	 QBB          : out  std_logic_vector(3 downto 0)  -- sortie Q
     );
@@ -64,7 +65,8 @@ fsm_mapping : zigbee_fsm -- port map du bloc fsm
 	 mem_state  => mem_state,
 	 dac_ready  => dac_ready,
      IBB        => IBB,
-	 QBB        => QBB
+	 QBB        => QBB,
+	ready	=> ready
     );
 	
 en_gen_map : en_gen -- port map du bloc gen_enable
@@ -75,19 +77,6 @@ en_gen_map : en_gen -- port map du bloc gen_enable
 	 clk_out  => en_10MHz
 	 );
 	 
-assign_ready : process(resetn, dac_ready)
-begin
-if(resetn = '0') then
-  ready <= '0';
-else	 
-  if(dac_ready = '1') then
-    ready   <= '1';
-  else
-    ready   <= '0';
-  end if;
-end if;
-
-end process;
 	  
 end TL_codeur_IQ_arch;
 	 
