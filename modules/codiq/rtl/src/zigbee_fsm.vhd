@@ -318,7 +318,7 @@ begin
 				if(dac_ready = '1') then
 		            if(cpt < x"4") then
 						S_AI_next	<= S_AI;
-						S_AQ_next	<= S_AQ;
+						S_AQ_next	<= '1';
 						cpt_next	<= std_logic_vector(unsigned(cpt)+1);
 
 		                S_QBB <= mem_array_Q(to_integer(unsigned(cpt)));
@@ -333,7 +333,7 @@ begin
 		                if (cpt = x"4" and cpt_old = x"3") then
 							cpt_next 	<= cpt;
 							S_AI_next	<= S_AI;
-							S_AQ_next	<= S_AQ;
+							S_AQ_next	<= '1';
 						
 		                    if(S_AI = '0') then
 		                        S_IBB	<= std_logic_vector(-(signed(mem_array_I(to_integer(unsigned(cpt))))));
@@ -344,7 +344,7 @@ begin
 						end if;
 
 						if(cpt = 4 and en = '1') then
-		                	S_AQ_next	<= S_AQ;
+		                	S_AQ_next	<= '1';
 		                    S_AI_next	<= (b_in xor b_in_prev) xnor S_AI;
 							cpt_next 	<= cpt;
 							S_IBB		<= temp_IBB;
