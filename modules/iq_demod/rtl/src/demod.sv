@@ -1,6 +1,3 @@
-timeunit 1ns;
-timeprecision 1ns;
-
 module demodulation(
 	input logic clk,
 	input logic resetn,
