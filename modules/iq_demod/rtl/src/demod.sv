@@ -25,20 +25,6 @@ module demodulation(
 				.demod_rdy(demod_rdy)
 	);
 
-	/*fsm sincos (		.clk(clk),
-				.resetn(resetn),
-				.cosine_out(cosine_in),
-				.sine_out(sine_in)
-	);
-	always_ff @(posedge clk, negedge resetn)
-		begin
-			if (~resetn) 
-			begin
-				I_BB <= 0;
-				Q_BB <= 0;
-			end
-		end //always ff
-	*/
 	always_comb
 	begin
 		unique case (sine_in)
@@ -88,10 +74,6 @@ module demodulation(
 		endcase
 	end //always comb
 
-	/*assign IS = sine_in;//sine_in * I_IF;
-	assign IC = cosine_in;//cosine_in * I_IF;
-	assign QS = sine_in;//sine_in * Q_IF;
-	assign QC = cosine_in * Q_IF;*/
 	assign I_BB_f = (IC + QS) * -1;
 	assign Q_BB_f = (QC - IS) * -1;
 	assign I_BB[4:0] = I_BB_f[4:0];

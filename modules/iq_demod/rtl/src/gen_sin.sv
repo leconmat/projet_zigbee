@@ -133,6 +133,12 @@ always_comb
 			sine_out = 0;
 			next_state = ONE;
 		     end
+		default :
+			begin
+			sine_out = 0;
+			cosine_out = 1;
+			next_state = INIT;
+			end
 		endcase
 	end
 
