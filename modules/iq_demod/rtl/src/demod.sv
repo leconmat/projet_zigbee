@@ -39,50 +39,61 @@ module demodulation(
 			end
 		end //always ff
 	*/
-	/*always_comb
+	always_comb
 	begin
-		if ( (sine_in == 2'b00) && (cosine_in == 2'b01) ) 
-		begin
-			IS = 0;
-			QS = 0;
-			IC = I_IF;
-			QC = Q_IF;
-		end
-		else if ( (sine_in == 2'b01) && (cosine_in == 2'b00) ) 
-		begin
-			IS = I_IF;
-			QS = Q_IF;
-			IC = 0;
-			QC = 0;
-		end
-		else if ( (sine_in == 2'b00) && (cosine_in == 2'b11) ) 
-		begin
-			IS = 0;
-			QS = 0;
-			IC = ((~I_IF)+(1'b1));
-			QC = ((~Q_IF)+(1'b1));
-		end
-		else if ( (sine_in == 2'b11) && (cosine_in == 2'b00) ) 
-		begin
-			IS = ((~I_IF)+1'b1);
-			QS = ((~Q_IF)+1'b1);
-			IC = 0;
-			QC = 0;
-		end
-		else 
-		begin
-			IS = 0;
-			QS = 0;
-			IC = 0;
-			QC = 0;
-		end
-	end //always comb*/
-	assign IS = sine_in * I_IF;
-	assign IC = cosine_in * I_IF;
-	assign QS = sine_in * Q_IF;
-	assign QC = cosine_in * Q_IF;	
-	assign I_BB_f = IC/*[6:2]*/ - QS/*[6:2]*/;
-	assign Q_BB_f = IS/*[6:2]*/ + QC/*[6:2]*/;
+		unique case (sine_in)
+			-2:
+			begin
+				IS <= 0;
+				QS <= 0;
+			end
+			-1:
+			begin
+				IS <= -I_IF;
+				QS <= -Q_IF;
+			end
+			0:
+			begin
+				IS <= 0;
+				QS <= 0;
+			end
+			1:
+			begin
+				IS <= I_IF;
+				QS <= Q_IF;
+			end
+		endcase
+
+		unique case (cosine_in)
+			-2:
+			begin
+				IC <= 0;
+				QC <= 0;
+			end
+			-1:
+			begin
+				IC <= -I_IF;
+				QC <= -Q_IF;
+			end
+			0:
+			begin
+				IC <= 0;
+				QC <= 0;
+			end
+			1:
+			begin
+				IC <= I_IF;
+				QC <= Q_IF;
+			end
+		endcase
+	end //always comb
+
+	/*assign IS = sine_in;//sine_in * I_IF;
+	assign IC = cosine_in;//cosine_in * I_IF;
+	assign QS = sine_in;//sine_in * Q_IF;
+	assign QC = cosine_in * Q_IF;*/
+	assign I_BB_f = (IC + QS) * -1;
+	assign Q_BB_f = (QC - IS) * -1;
 	assign I_BB[4:0] = I_BB_f[4:0];
 	assign Q_BB[4:0] = Q_BB_f[4:0];
 

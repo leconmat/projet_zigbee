@@ -113,6 +113,7 @@ fsm_t current_state, next_state;
 		current_state <= INIT;
 		data_out <= 0;
 		temp <= 0;
+		out_valid <= 0;
 	     end
 	     else 
 		begin
@@ -138,32 +139,33 @@ always_comb
 	     unique case(current_state)
 		INIT:
 		    begin
-			next_state = ZERO;
+			sel <= 3'b000;
+			next_state <= ZERO;
 		    end
 		ZERO:
 		     begin
-			sel = 3'b000;
-			next_state = ONE;
+			sel <= 3'b000;
+			next_state <= ONE;
 			end
 		ONE:
 		     begin
-			sel = 3'b001;
-			next_state = TWO;			
+			sel <= 3'b001;
+			next_state <= TWO;			
 			end
 		TWO:
 		     begin
-			sel = 3'b010;
-			next_state = THREE;		
+			sel <= 3'b010;
+			next_state <= THREE;		
 			end
 		THREE:
 		     begin
-			sel = 3'b011;
-			next_state = FOUR;
+			sel <= 3'b011;
+			next_state <= FOUR;
 			end
 		FOUR:
 		     begin
-			sel = 3'b100;
-			next_state = ZERO;
+			sel <= 3'b100;
+			next_state <= ZERO;
 			end
 		endcase
 	end

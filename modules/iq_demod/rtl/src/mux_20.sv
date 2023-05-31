@@ -28,5 +28,9 @@ begin
 		out1 = in_8;
 		out2= in_9;
 	end
+	else begin
+		out1 = 0;
+		out2= 0;
+	end
 end
 endmodule 
