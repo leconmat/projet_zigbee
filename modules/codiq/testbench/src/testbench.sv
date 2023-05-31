@@ -31,8 +31,6 @@ real gaptot;
 int itetot = 0;
 int ttot = 0;
 real moyenne;
-real variance;
-real ecartyp;
 real pi = 3.1416;
 bit secu = 0;
 
@@ -112,7 +110,7 @@ end
 
 initial begin
 
-	#190ns;
+	#300ns;
 
 	forever @(posedge clk_50MHz) begin
 		if (dac_ready == 1 & mem_state == 1) begin		

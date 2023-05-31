@@ -28,35 +28,36 @@ architecture Behavioral of zigbee_fsm is
     type mem_t_I is array(4 downto 0) of std_logic_vector(3 downto 0); -- rom I
     type mem_t_Q is array(4 downto 0) of std_logic_vector(3 downto 0); -- rom Q
 
-    signal C_STATE     : StateType;        	 			-- etat actuel (current state)
-    signal N_STATE     : StateType;          			-- etat suivant (next state)
+    signal C_STATE     : StateType;        	 					-- etat actuel (current state)
+    signal N_STATE     : StateType;          					-- etat suivant (next state)
 
-    signal cpt_old  : std_logic_vector(2 downto 0);		-- variable precedente compteur
-    signal cpt      : std_logic_vector(2 downto 0);		-- variable d increment compteur
-    signal cpt_next : std_logic_vector(2 downto 0);		-- variable suivante d increment compteur
+    signal cpt_old  		: std_logic_vector(2 downto 0);		-- variable precedente compteur
+    signal cpt      		: std_logic_vector(2 downto 0);		-- variable d increment compteur
+    signal cpt_next 		: std_logic_vector(2 downto 0);		-- variable suivante d increment compteur
 
-    signal S_IBB       : std_logic_vector(3 downto 0); 	-- variable temporaire pour IBB
-    signal S_QBB       : std_logic_vector(3 downto 0); 	-- variable temporaire pour QBB
-	signal temp_IBB    : std_logic_vector(3 downto 0); 	-- variable temporaire pour IBB
-    signal temp_QBB    : std_logic_vector(3 downto 0); 	-- variable temporaire pour QBB
-    signal S_AI        : std_logic;  	           		-- signal temporaire Ai
-    signal S_AQ        : std_logic;  	           		-- signal temporaire Aq
+    signal S_IBB       		: std_logic_vector(3 downto 0); 	-- variable temporaire pour IBB
+    signal S_QBB       		: std_logic_vector(3 downto 0); 	-- variable temporaire pour QBB
+	signal temp_IBB    		: std_logic_vector(3 downto 0); 	-- variable temporaire pour IBB
+    signal temp_QBB    		: std_logic_vector(3 downto 0); 	-- variable temporaire pour QBB
+    signal S_AI        		: std_logic;  	           			-- signal temporaire Ai
+    signal S_AQ        		: std_logic;  	           			-- signal temporaire Aq
 
-    signal b_in_prev   : std_logic;	           			-- stockage signal b_in	
+    signal b_in_prev   		: std_logic;	           			-- stockage signal b_in	
 
-    signal S_AI_next   : std_logic;  	           		-- signal temporaire Ai suivant
-    signal S_AQ_next   : std_logic;  	           		-- signal temporaire Aq suivant
+    signal S_AI_next   		: std_logic;  	           			-- signal temporaire Ai suivant
+    signal S_AQ_next   		: std_logic;  	           			-- signal temporaire Aq suivant
 
-	signal f_dac_down  : std_logic;						-- flag d etat bas du dac
-	signal f_temp_dac  : std_logic;
+	signal f_dac_down		: std_logic;						-- flag d etat bas du dac
+	signal f_temp_dac  		: std_logic;
 
-    signal mem_array_I 		: mem_t_I;					-- rom memoire I
-    signal mem_array_Q 		: mem_t_Q;					-- rom memoire Q
+    signal mem_array_I 		: mem_t_I;							-- rom memoire I
+    signal mem_array_Q 		: mem_t_Q;							-- rom memoire Q
 
-    signal en_prev			: std_logic;				-- valeur precedente enable
-    signal en_10MHz_prev    : std_logic;				-- valeur precedente enable 10 MHz
+    signal en_prev			: std_logic;						-- valeur precedente enable
+    signal en_10MHz_prev    : std_logic;						-- valeur precedente enable 10 MHz
+	signal dac_ready_prev	: std_logic;						-- valeur precedente dac_ready
 
-    signal s_b_in_prev 		: std_logic;				-- signal d assignation de b_in_prev
+    signal s_b_in_prev 		: std_logic;						-- signal d assignation de b_in_prev
 
 
 begin
@@ -112,7 +113,7 @@ begin
 					end if;
 				else
 				    if(dac_ready = '1' and ((cpt = x"4" and cpt_old = x"3") or (cpt = x"0" and cpt_old = x"1") or (cpt = x"0" and cpt_old = x"0"))) then
-					   f_dac_down <= '0';
+						f_dac_down <= '0';
 					end if;
 				end if;
 			end if;
@@ -132,6 +133,7 @@ begin
             b_in_prev       	<= '0';
             s_b_in_prev			<= '0';
             cpt_old 			<= (others => '0');
+			dac_ready_prev		<= '0';
 
         else
             if(rising_edge(clk)) then
@@ -139,14 +141,9 @@ begin
                 en_prev 			<= en;
 				temp_IBB			<= S_IBB;
 				temp_QBB			<= S_QBB;
-				if(f_dac_down = '1' and c_state = Q and f_temp_dac = '1') then
-					cpt   			<= std_logic_vector(unsigned(cpt)+1);
-				else
-					if(f_dac_down = '1' and c_state = I and f_temp_dac = '1') then
-						cpt   		<= std_logic_vector(unsigned(cpt)-1);
-					end if;
-				end if;
-                if(en_10MHz = '1' and en_10MHz_prev = '0') then                    
+				dac_ready_prev		<= dac_ready;
+
+                if(en_10MHz = '1' and en_10MHz_prev = '0') then       
 			        cpt 			<= cpt_next;
                     cpt_old 		<= cpt;
 					b_in_prev 		<= s_b_in_prev;
@@ -287,7 +284,7 @@ begin
     end process FSM_STATES;
 
     --************************************************************************************************************************************************
-    FSM_OUTPUTS : process (C_STATE, S_AI, S_AQ, en, cpt, cpt_old, b_in, mem_array_I, b_in_prev, mem_array_Q, mem_state, dac_ready, temp_IBB, temp_QBB) -- contient les sorties des etats
+    FSM_OUTPUTS : process (C_STATE, S_AI, S_AQ, en, cpt, cpt_old, b_in, mem_array_I, b_in_prev, mem_array_Q, mem_state, dac_ready, temp_IBB, temp_QBB, dac_ready_prev) -- contient les sorties des etats
     begin
 
         case C_STATE is
@@ -367,6 +364,10 @@ begin
 				S_AI_next		<= S_AI;
 				S_AQ_next		<= S_AQ;
 
+				if(f_dac_down = '1' and f_temp_dac = '1' and cpt /= x"0") then
+					cpt_next   	<= std_logic_vector(unsigned(cpt)-1);
+				end if;
+
 				if(dac_ready = '1') then
 		            if(cpt > x"0") then
 						S_AI_next	<= S_AI;
@@ -426,54 +427,58 @@ begin
                 S_IBB 			<= temp_IBB;
 				S_AI_next		<= S_AI;
 				S_AQ_next		<= S_AQ;
-				
-				if(dac_ready = '1') then
-                	if(cpt < x"4") then
+
+				if(f_dac_down = '1' and f_temp_dac = '1' and cpt /= x"4") then
+					cpt_next   		<= std_logic_vector(unsigned(cpt)+1);
+				end if;
+
+				if(dac_ready_prev = '1' and dac_ready = '1') then
+	            	if(cpt < x"4") then
 						S_AI_next	<= S_AI;
 						S_AQ_next	<= S_AQ;
 						cpt_next	<= std_logic_vector(unsigned(cpt)+1);
 
-                    	if(S_AI = '0') then
-                    	    S_IBB    <= std_logic_vector(-(signed(mem_array_I(to_integer(unsigned(cpt))))));
-                    	else
-                    	    S_IBB    <= mem_array_I(to_integer(unsigned(cpt)));
-                    	end if;
-	
-                    	if(S_AQ = '0') then
-                    	    S_QBB    <= std_logic_vector(-(signed(mem_array_Q(to_integer(unsigned(cpt))))));
-                    	else
-                    	    S_QBB    <= mem_array_Q(to_integer(unsigned(cpt)));
-                    	end if;
-                	else	
-                    	if(cpt = x"4" and cpt_old = x"3") then
+	                	if(S_AI = '0') then
+	                	    S_IBB    <= std_logic_vector(-(signed(mem_array_I(to_integer(unsigned(cpt))))));
+	                	else
+	                	    S_IBB    <= mem_array_I(to_integer(unsigned(cpt)));
+	                	end if;
+
+	                	if(S_AQ = '0') then
+	                	    S_QBB    <= std_logic_vector(-(signed(mem_array_Q(to_integer(unsigned(cpt))))));
+	                	else
+	                	    S_QBB    <= mem_array_Q(to_integer(unsigned(cpt)));
+	                	end if;
+	            	else	
+	                	if(cpt = x"4" and cpt_old = x"3") then
 							cpt_next 	<= cpt;
 							S_AI_next	<= S_AI;
 							S_AQ_next	<= S_AQ;
 
-                    	    if(S_AI = '0') then
-                    	        S_IBB    <= std_logic_vector(-(signed(mem_array_I(to_integer(unsigned(cpt))))));
-                    	    else
-                    	        S_IBB    <= mem_array_I(to_integer(unsigned(cpt)));
-                    	    end if;
-	
-                    	    if(S_AQ = '0') then
-                    	        S_QBB    <= std_logic_vector(-(signed(mem_array_Q(to_integer(unsigned(cpt))))));
-                    	    else
-                    	        S_QBB    <= mem_array_Q(to_integer(unsigned(cpt)));
-                    	    end if;
-                    	end if;
-	
+	                	    if(S_AI = '0') then
+	                	        S_IBB    <= std_logic_vector(-(signed(mem_array_I(to_integer(unsigned(cpt))))));
+	                	    else
+	                	        S_IBB    <= mem_array_I(to_integer(unsigned(cpt)));
+	                	    end if;
+
+	                	    if(S_AQ = '0') then
+	                	        S_QBB    <= std_logic_vector(-(signed(mem_array_Q(to_integer(unsigned(cpt))))));
+	                	    else
+	                	        S_QBB    <= mem_array_Q(to_integer(unsigned(cpt)));
+	                	    end if;
+	                	end if;
+
 						if (cpt = x"4" and en = '1') then
 							S_AQ_next	<= S_AQ;
-                    	    S_AI_next	<= (b_in xor b_in_prev) xnor S_AI;
+	                	    S_AI_next	<= (b_in xor b_in_prev) xnor S_AI;
 							cpt_next 	<= cpt;
 							S_IBB		<= temp_IBB;
 							S_QBB		<= temp_QBB;
 						end if;
-                	end if;
+	            	end if;
 				else
 					S_AQ_next	<= S_AQ;
-                    S_AI_next	<= S_AI;
+                	S_AI_next	<= S_AI;
 					cpt_next 	<= cpt;
 					S_IBB		<= temp_IBB;
 					S_QBB		<= temp_QBB;
