@@ -9,3 +9,4 @@ export CORDIC_DIR=$(PROJECT_DIR)/modules/cordic
 export CODIQ_DIR=$(PROJECT_DIR)/modules/codiq
 export FIFO_TX_DIR=$(PROJECT_DIR)/modules/fifo_tx
 export FIFO_RX_DIR=$(PROJECT_DIR)/modules/fifo_rx
+export IQ_DEMOD_DIR=$(PROJECT_DIR)/modules/iq_demod
