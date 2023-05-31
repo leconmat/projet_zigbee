@@ -1,4 +1,4 @@
-module shift_register (
+module shift_register_20 (
   input  logic                       clk,           // Main Clock
   input  logic                       reset,         // Reset actif à l'état bas
   input  logic                [4:0] data_in,       // Donnée à shifter

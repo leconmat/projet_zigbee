@@ -1,6 +1,3 @@
-timeunit 1ns;
-timeprecision 1ns;
-
 module demodulation(
 	input logic clk,
 	input logic resetn,
@@ -86,7 +83,7 @@ module demodulation(
 	assign QC = cosine_in * Q_IF;	
 	assign I_BB_f = IC/*[6:2]*/ - QS/*[6:2]*/;
 	assign Q_BB_f = IS/*[6:2]*/ + QC/*[6:2]*/;
-	assign I_BB[4:0] = I_BB_f[6:2];
-	assign Q_BB[4:0] = Q_BB_f[6:2];
+	assign I_BB[4:0] = I_BB_f[4:0];
+	assign Q_BB[4:0] = Q_BB_f[4:0];
 
 endmodule

@@ -41,6 +41,6 @@ always_comb
 			end
 		endcase
 	end //always_comb
-	assign demod_rdy= current_state_valid==S_ENABLE?1:0;
+	assign demod_rdy = current_state_valid == S_ENABLE ? 1 : 0;
 endmodule
 

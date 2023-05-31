@@ -1,4 +1,4 @@
-module mux2(
+module mux2_20(
 
 	input logic [4:0] in_0, in_1, in_2, in_3, in_4, in_5, in_6, in_7, in_8, in_9,
 	input logic [2:0] sel,

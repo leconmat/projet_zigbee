@@ -9,14 +9,13 @@
 `define Q9 9'h063
 `define Q10 9'h0C1
 
-module filter(
+module filter_20(
 
 	input logic clk,
 	input logic resetn,
 	input bit in_valid,
 	input logic signed [4:0] data_in,
 	output logic signed [4:0] data_out,
-	output bit pret,
 	output bit out_valid
 );
 
@@ -31,7 +30,7 @@ logic signed [4:0] shift_reg0, shift_reg1, shift_reg2, shift_reg3, shift_reg4, s
 
 logic [2:0] shift_count;
 
-mux2 data_reg1 (.in_0(shift_reg0),
+mux2_20 data_reg1 (.in_0(shift_reg0),
 	    .in_1(shift_reg1),
 	    .in_2(shift_reg2),
 	    .in_3(shift_reg3),
@@ -45,7 +44,7 @@ mux2 data_reg1 (.in_0(shift_reg0),
 	    .out1(data_1_1),
 	    .out2(data_2_1)
 );
-mux2 data_reg2 (.in_0(shift_reg19),
+mux2_20 data_reg2 (.in_0(shift_reg19),
 	    .in_1(shift_reg18),
 	    .in_2(shift_reg17),
 	    .in_3(shift_reg16),
@@ -59,7 +58,7 @@ mux2 data_reg2 (.in_0(shift_reg19),
 	    .out1(data_1_2),
 	    .out2(data_2_2)
 );
-mux factor (.in_0(`Q1),
+mux_20 factor (.in_0(`Q1),
 	    .in_1(`Q2),
 	    .in_2(`Q3),
 	    .in_3(`Q4),
@@ -75,7 +74,7 @@ mux factor (.in_0(`Q1),
 );
 
 
-shift_register shift_r (.clk(clk),
+shift_register_20 shift_r (.clk(clk),
 			.reset(resetn),
 			.data_in(data_in),
 			.data_shift_en(in_valid),
