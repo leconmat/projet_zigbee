@@ -39,8 +39,12 @@ always_comb
 				else
 					next_state_valid <= IDLE; 
 			end
+		default:
+			begin
+				next_state_valid <= IDLE;
+			end
 		endcase
 	end //always_comb
-	assign demod_rdy = current_state_valid == S_ENABLE ? 1 : 0;
+	assign demod_rdy = (current_state_valid == S_ENABLE) ? 1 : 0;
 endmodule
 

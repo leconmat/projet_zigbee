@@ -8,7 +8,7 @@ module shift_register_20 (
 );
 
 
-always_ff @(posedge clk) begin //1
+always_ff @(posedge clk, negedge reset) begin //1
 
   if      (~reset)         begin //2
                             data_out19<=10'b0;

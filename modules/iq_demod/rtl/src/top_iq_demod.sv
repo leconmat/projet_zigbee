@@ -1,7 +1,7 @@
 module top_iq_demod(
 	input logic clk,
 	input logic resetn,
-	input bit ADC_rdy, // on reçoit ça de l'ADC
+	input bit ADC_rdy_i, // on reçoit ça de l'ADC
 	input logic signed [4:0] I_IF,
 	input logic signed [4:0] Q_IF,
 	output bit demod_iq_valid, // on envoie ça au cordiq
@@ -15,7 +15,7 @@ bit  filter_en, valid_out_I, valid_out_Q; // demod sort filter_en et le filter l
 demodulation demod(
 	.clk(clk),
 	.resetn(resetn),
-	.ADC_rdy(ADC_rdy),
+	.ADC_rdy(ADC_rdy_i),
 	.I_IF(I_IF),
 	.Q_IF(Q_IF),
 	.sine_in(sine_IN),
