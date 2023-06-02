@@ -51,9 +51,12 @@ always begin
 end
 
 always begin 
-	 @(posedge decoded_pulse);
-	 if(decoded_data != sentData.pop_front())
-		$display("Invalid data");
+	automatic bit [7:0] expectedData;
+	
+	@(posedge decoded_pulse);
+	expectedData = sentData.pop_front();
+	if(decoded_data != expectedData)
+		$display("Invalid data %d. Expected %d", decoded_data, expectedData);
 	else
 		$display("Good data!");
 
@@ -72,9 +75,9 @@ initial begin
 		psel = 1'b1;
 	   	pwrite = 1'b1;
 
-		for(integer i = 0 ; i < 64 ; i++) begin
+		for(integer i = 0 ; i < 10000 ; i++) begin
 			penable = 1'b1;
-			pwdata <= $urandom ;
+			pwdata = $urandom;
 			sentData.push_back(pwdata);
 			#20;
 			penable = 1'b0;
@@ -134,8 +137,6 @@ initial begin
 		en_IQ = 0;
 		#200;
 		en_IQ = 1;
-		$display("Donnée lue : %h", data_out);
-  	 
 end
 	
 endmodule
