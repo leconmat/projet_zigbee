@@ -158,9 +158,9 @@ begin
         end if;
     end process assign;
 
-	en_dac_assign : process (clk, resetn)
+	en_dac_assign : process (clk, resetn, dac_ready, c_state)
 	begin
-		if(resetn = '0') then -- reset actif a 0
+		if(resetn = '0' or dac_ready = '0' or c_state = RST_STATE) then -- reset actif a 0
             en_dac <= '0';
         else
             if(rising_edge(clk)) then
@@ -284,7 +284,7 @@ begin
     end process FSM_STATES;
 
     --************************************************************************************************************************************************
-    FSM_OUTPUTS : process (C_STATE, S_AI, S_AQ, en, cpt, cpt_old, b_in, mem_array_I, b_in_prev, mem_array_Q, mem_state, dac_ready, temp_IBB, temp_QBB, dac_ready_prev) -- contient les sorties des etats
+    FSM_OUTPUTS : process (C_STATE, S_AI, S_AQ, en, cpt, cpt_old, b_in, mem_array_I, b_in_prev, mem_array_Q, mem_state, dac_ready, temp_IBB, temp_QBB, dac_ready_prev, f_dac_down, f_temp_dac) -- contient les sorties des etats
     begin
 
         case C_STATE is

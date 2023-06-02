@@ -10,7 +10,7 @@ entity TL_codeur_IQ is
    clk	        : in   std_logic;					 -- signal de clk 50 MHz 
    en_2MHz      : in   std_logic; 				     -- signal enable 2 MHz reçu depuis le bloc FIFO a chaque envoi de bit de data b_in
    b_in         : in   std_logic;                    -- data reçue bit a bit via la FIFO
-   mem_state    : in   std_logic; 		-- signal 2 bits provenant de la FIFO indiquant si leur memoire est vide ou pas ("00" memoire vide)
+   mem_state    : in   std_logic; 					 -- signal 2 bits provenant de la FIFO indiquant si leur memoire est vide ou pas ("00" memoire vide)
    dac_ready    : in   std_logic;					 -- signal d'etat ready du DAC (ready a '1')
    IBB          : out  std_logic_vector(3 downto 0); -- sortie IBB
    QBB          : out  std_logic_vector(3 downto 0); -- sortie QBB
