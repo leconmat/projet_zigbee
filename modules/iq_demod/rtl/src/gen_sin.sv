@@ -37,14 +37,14 @@ always_ff @(posedge clk, negedge resetn)
 begin
      if(~resetn) begin
 	current_state <= INIT;
-	counter = 0;
+	counter <= 0;
      end
      else if (counter==4) begin
 	current_state <= next_state;
-	counter = 0;
+	counter <= 0;
 	end
      else
-	counter++;
+	counter <= counter + 1;
 end
 
 // == Always comb ==============================================================

@@ -142,16 +142,6 @@ module filter_20(
 	always_ff @(posedge clk, negedge resetn)
 	begin
 	     if(~resetn) begin
-		out_factor1 <= `Q1;
-		out_factor2 <= `Q2;
-		out_factor3 <= `Q3;
-		out_factor4 <= `Q4;
-		out_factor5 <= `Q5;
-		out_factor6 <= `Q6;
-		out_factor7 <= `Q7;
-		out_factor8 <= `Q8;
-		out_factor9 <= `Q9;
-		out_factor10 <= `Q10;
 		current_state <= INIT;
 		out_valid <= 0;
 	     end
@@ -224,20 +214,20 @@ module filter_20(
 	assign sum1_5 = data_1_1_5 + data_2_1_5;
 	assign sum2_5 = data_1_2_5 + data_2_2_5;
 
-	assign mult1_1 = out_factor1 * sum1_1;
-	assign mult2_1 = out_factor2 * sum2_1;
+	assign mult1_1 = 1 * sum1_1;
+	assign mult2_1 = -9 * sum2_1;
 
-	assign mult1_2 = out_factor3 * sum1_2;
-	assign mult2_2 = out_factor4 * sum2_2;
+	assign mult1_2 = -2 * sum1_2;
+	assign mult2_2 = 13 * sum2_2;
 
-	assign mult1_3 = out_factor5 * sum1_3;
-	assign mult2_3 = out_factor6 * sum2_3;
+	assign mult1_3 = 14 * sum1_3;
+	assign mult2_3 = -14 * sum2_3;
 
-	assign mult1_4 = out_factor7 * sum1_4;
-	assign mult2_4 = out_factor8 * sum2_4;
+	assign mult1_4 = -39 * sum1_4;
+	assign mult2_4 = -3 * sum2_4;
 
-	assign mult1_5 = out_factor9 * sum1_5;
-	assign mult2_5 = out_factor10 * sum2_5;
+	assign mult1_5 = 99 * sum1_5;
+	assign mult2_5 = 193 * sum2_5;
 
 	assign tot = mult1_1 + mult2_1 + mult1_2 + mult2_2 + mult1_3 + mult2_3 + mult1_4 + mult2_4 + mult1_5 + mult2_5;
 	

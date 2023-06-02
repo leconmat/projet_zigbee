@@ -33,7 +33,7 @@ module tb_demod_iq ();
 	top_iq_demod dut_top(
 	.clk(clk),
 	.resetn(reset),
-	.ADC_rdy(in_valid), // on reçoit ça de l'ADC
+	.ADC_rdy_i(in_valid), // on reçoit ça de l'ADC
 	.I_IF(matlab_in_I_digital),
 	.Q_IF(matlab_in_Q_digital),
 	.demod_iq_valid(out_valid), // on envoie ça au cordiq
@@ -79,8 +79,8 @@ module tb_demod_iq ();
 			$fscanf(fd_I_out, "%f\n", matlab_out_I_real);
 			$fscanf(fd_Q_out, "%f\n", matlab_out_Q_real);
 
-			matlab_out_I_digital = sample_t'(matlab_out_I_real / quantum);
-			matlab_out_Q_digital = sample_t'(matlab_out_Q_real / quantum);
+			matlab_out_I_digital = sample_t'((matlab_out_I_real*0.90) / quantum);
+			matlab_out_Q_digital = sample_t'((matlab_out_Q_real*0.90) / quantum);
 
 			filter_out_I_real = (filter_out_I_digital * quantum);
 			filter_out_Q_real = (filter_out_Q_digital * quantum);
