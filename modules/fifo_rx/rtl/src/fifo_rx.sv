@@ -30,6 +30,8 @@ logic [PTR_WIDTH:0] wr_ptr, rd_ptr;
 // Memory flag
 logic full;  
 logic empty; 
+logic wr_en;
+logic rd_en;
 reg [7:0] shift_register;
 reg [WIDTH-1:0] i;
 reg en_cdr_prec;
