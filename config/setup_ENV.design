@@ -1,12 +1,13 @@
 #! /bin/bash
 
 # Library definition
-export PROJECT_LIBS_DIR=$(PROJECT_DIR)/libs
+export PROJECT_LIBS_DIR=${PROJECT_DIR}/libs
 
 # Modules directories
-export CDR_DIR=$(PROJECT_DIR)/modules/CDR
-export CORDIC_DIR=$(PROJECT_DIR)/modules/cordic
-export CODIQ_DIR=$(PROJECT_DIR)/modules/codiq
-export FIFO_TX_DIR=$(PROJECT_DIR)/modules/fifo_tx
-export FIFO_RX_DIR=$(PROJECT_DIR)/modules/fifo_rx
-export IQ_DEMOD_DIR=$(PROJECT_DIR)/modules/iq_demod
+export CDR_DIR=${PROJECT_DIR}/modules/CDR
+export CORDIC_DIR=${PROJECT_DIR}/modules/cordic
+export CODIQ_DIR=${PROJECT_DIR}/modules/codiq
+export FIFO_TX_DIR=${PROJECT_DIR}/modules/fifo_tx
+export FIFO_RX_DIR=${PROJECT_DIR}/modules/fifo_rx
+export IQ_DEMOD_DIR=${PROJECT_DIR}/modules/iq_demod
+export ZIGBEE_PLATFORM_DIR=${PROJECT_DIR}/platforms/zigbee_platform

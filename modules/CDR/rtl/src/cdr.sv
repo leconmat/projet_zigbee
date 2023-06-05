@@ -124,7 +124,27 @@ end
 
 //fin data gen
 
-assign data_en_o = data_en_w;
-assign data_o = data_i;
+
+// Decision
+logic data_en_w_q;
+
+always_ff @(posedge clk, negedge resetn_i) begin
+  if(~resetn_i) begin
+    data_en_w_q <= 'b0;
+    data_en_o <= 'b0;
+    data_o <= 'b0;
+  end
+  else begin
+    data_en_w_q <= data_en_w;
+    if(~data_en_w && data_en_w_q) begin
+      data_o <= data_i;
+      data_en_o <= 1'b1;
+    end
+    else begin
+      data_o <= data_o;
+      data_en_o <= 'b0;
+    end
+  end
+end
 
 endmodule

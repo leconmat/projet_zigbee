@@ -1,0 +1,17 @@
+ 
+****************************************
+Report : compile_options
+Design : zigbee_platform
+Version: J-2014.09-SP2
+Date   : Mon Jun  5 11:06:34 2023
+****************************************
+
+Design                                   Compile Option         Value
+--------------------------------------------------------------------------------
+zigbee_platform                          flatten                false
+                                         structure              true
+                                         structure_boolean      false
+                                         structure_timing       true
+                                         isolate_port           disabled
+--------------------------------------------------------------------------------
+1

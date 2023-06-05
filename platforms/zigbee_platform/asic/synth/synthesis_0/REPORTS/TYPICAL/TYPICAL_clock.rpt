@@ -1,0 +1,20 @@
+ 
+****************************************
+Report : clocks
+Design : zigbee_platform
+Version: J-2014.09-SP2
+Date   : Mon Jun  5 11:06:40 2023
+****************************************
+
+Attributes:
+    d - dont_touch_network
+    f - fix_hold
+    p - propagated_clock
+    G - generated_clock
+    g - lib_generated_clock
+
+Clock          Period   Waveform            Attrs     Sources
+--------------------------------------------------------------------------------
+clk             20.00   {0 10}                        {clk_i}
+--------------------------------------------------------------------------------
+1

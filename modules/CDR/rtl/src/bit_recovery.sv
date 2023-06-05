@@ -66,7 +66,9 @@ assign overflow = (phase_q[5]^phase_r[5]) ? 0:(phase_diff[5]^phase_q[5]);
 
 always_comb begin  
   phase_diff = phase_q - phase_r;
-  if(overflow)
+  if(phase_q == 'b0 && phase_r == 'b0)
+    data_bits = 0;
+  else if(overflow)
     data_bits = data_bits;
   else if(phase_diff[5])
     data_bits = 0;

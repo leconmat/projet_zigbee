@@ -23,3 +23,5 @@ source /softslin/configCAO/Atrenta/config_Spyglass
 source /softslin/configCAO/Atrenta/licence_atrenta
 
 export MODELSIM="${PROJECT_DIR}/config/modelsim.ini"
+
+source config/setup_ENV.design
