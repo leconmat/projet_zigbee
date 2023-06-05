@@ -48,6 +48,11 @@ module demodulation(
 				IS <= I_IF;
 				QS <= Q_IF;
 			end
+			default:
+			begin
+				IS <= 0;
+				QS <= 0;
+			end
 		endcase
 
 		unique case (cosine_in)
@@ -71,12 +76,17 @@ module demodulation(
 				IC <= I_IF;
 				QC <= Q_IF;
 			end
+			default:
+			begin
+				IC <= 0;
+				QC <= 0;
+			end
 		endcase
 	end //always comb
 
 	assign I_BB_f = (IC + QS) * -1;
 	assign Q_BB_f = (QC - IS) * -1;
-	assign I_BB[4:0] = I_BB_f[4:0];
+	assign I_BB[4:0] = I_BB_f[4:0]; // CARTON ROUGE : à revoir
 	assign Q_BB[4:0] = Q_BB_f[4:0];
 
 endmodule

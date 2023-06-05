@@ -17,7 +17,7 @@ mkdir ${synth_dir}
 
 (
 # Set IP name
-IPname=$(echo $PWD | sed -e 's/^.*\/modules\/\([a-z]*\)\/.*/\1/')
+IPname=$(echo $PWD | sed -e 's/^.*\/modules\/\(.*\)\/.*\/.*/\1/')
 echo $IPname
 
 echo "#########################################"

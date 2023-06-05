@@ -1,16 +1,3 @@
-/*
-`define Q1 6'h00
-`define Q2 6'h3F
-`define Q3 6'h00
-`define Q4 6'h02
-`define Q5 6'h02
-`define Q6 6'h3E
-`define Q7 6'h3B
-`define Q8 6'h00
-`define Q9 6'h0C
-`define Q10 6'h18
-*/
-
 `define Q1 9'h001
 `define Q2 9'h1F7
 `define Q3 9'h1FE
@@ -32,8 +19,10 @@ module filter_20 (
 	output bit out_valid
 );
 
-logic signed [4:0] data_1_1, data_2_1,data_1_2, data_2_2;
+logic signed [4:0] data_1_1, data_2_1, data_1_2, data_2_2;
+logic signed [4:0] data_1_1_req, data_2_1_req, data_1_2_req, data_2_2_req;
 logic signed [8:0] out_factor1, out_factor2;
+logic signed [8:0] out_factor1_req, out_factor2_req;
 logic signed [17:0] mult1,mult2;
 logic signed [15:0] tot;
 logic signed [17:0] temp, n_temp;
@@ -42,6 +31,28 @@ logic [2:0] sel;
 logic signed [4:0] shift_reg0, shift_reg1, shift_reg2, shift_reg3, shift_reg4, shift_reg5, shift_reg6, shift_reg7, shift_reg8, shift_reg9,shift_reg10, shift_reg11, shift_reg12, shift_reg13, shift_reg14, shift_reg15, shift_reg16, shift_reg17, shift_reg18, shift_reg19;
 
 logic [2:0] shift_count;
+
+always @(posedge clk, negedge resetn)
+begin
+	if(~resetn)
+	begin
+		data_1_1 <= 0;
+		data_2_1 <= 0;
+		data_1_2 <= 0;
+		data_2_2 <= 0;
+		out_factor1 <= 0;
+		out_factor2 <= 0;
+	end
+	else
+	begin
+		data_1_1 <= data_1_1_req;
+		data_2_1 <= data_2_1_req;
+		data_1_2 <= data_1_2_req;
+		data_2_2 <= data_2_2_req;
+		out_factor1 <= out_factor1_req;
+		out_factor2 <= out_factor2_req;
+	end
+end
 
 mux # (.SIZE(5)) data_reg1 (.in_0(shift_reg0),
 	    .in_1(shift_reg1),
@@ -54,8 +65,8 @@ mux # (.SIZE(5)) data_reg1 (.in_0(shift_reg0),
 	    .in_8(shift_reg8),
 	    .in_9(shift_reg9),
 	    .sel(sel),
-	    .out1(data_1_1),
-	    .out2(data_2_1)
+	    .out1(data_1_1_req),
+	    .out2(data_2_1_req)
 );
 
 mux # (.SIZE(5)) data_reg2 (.in_0(shift_reg19),
@@ -69,11 +80,12 @@ mux # (.SIZE(5)) data_reg2 (.in_0(shift_reg19),
 	    .in_8(shift_reg11),
 	    .in_9(shift_reg10),
 	    .sel(sel),
-	    .out1(data_1_2),
-	    .out2(data_2_2)
+	    .out1(data_1_2_req),
+	    .out2(data_2_2_req)
 );
 
-mux # (.SIZE(9)) factor (.in_0(`Q1),
+mux # (.SIZE(9)) factor (
+	    .in_0(`Q1),
 	    .in_1(`Q2),
 	    .in_2(`Q3),
 	    .in_3(`Q4),
@@ -84,10 +96,9 @@ mux # (.SIZE(9)) factor (.in_0(`Q1),
 	    .in_8(`Q9),
 	    .in_9(`Q10),
 	    .sel(sel),
-	    .out1(out_factor1),
-	    .out2(out_factor2)
+	    .out1(out_factor1_req),
+	    .out2(out_factor2_req)
 );
-
 
 shift_register_20 shift_r (.clk(clk),
 			.reset(resetn),
@@ -122,17 +133,16 @@ typedef enum  {
 
 fsm_t current_state, next_state;
 
+
  always_ff @(posedge clk, negedge resetn)
 	begin
 	     if(~resetn) begin
 		current_state <= INIT;
-		data_out <= 0;
-		temp <= 0;
 		out_valid <= 0;
 	     end
 	     else 
 		begin
-			if (shift_count == 3'b100) begin 
+			if (shift_count == 3'b000) begin 
 				data_out <= temp[13:9];
 				
 				temp <= tot;
@@ -157,33 +167,33 @@ always_comb
 	     unique case(current_state)
 		INIT:
 		    begin
-			sel <= 3'b000;
-			next_state <= ZERO;
+			sel = 3'b000;
+			next_state = ZERO;
 		    end
 		ZERO:
 		     begin
-			sel <= 3'b000;
-			next_state <= ONE;
+			sel = 3'b000;
+			next_state = ONE;
 			end
 		ONE:
 		     begin
-			sel <= 3'b001;
-			next_state <= TWO;			
+			sel = 3'b001;
+			next_state = TWO;			
 			end
 		TWO:
 		     begin
-			sel <= 3'b010;
-			next_state <= THREE;		
+			sel = 3'b010;
+			next_state = THREE;		
 			end
 		THREE:
 		     begin
-			sel <= 3'b011;
-			next_state <= FOUR;
+			sel = 3'b011;
+			next_state = FOUR;
 			end
 		FOUR:
 		     begin
-			sel <= 3'b100;
-			next_state <= ZERO;
+			sel = 3'b100;
+			next_state = ZERO;
 			end
 		endcase
 	end
@@ -203,13 +213,17 @@ always_comb
 	MULT_LOOKAHEAD #(.SIZE(9)) mult1_multiplier (
 		.A(out_factor1),
 		.B({sum1[5] ? 3'b111 : 3'b000, sum1}),
-		.S(mult1[17:0])
+		.S(mult1[17:0]),
+		.clk(clk),
+		.resetn(resetn)
 	);
 
 	MULT_LOOKAHEAD #(.SIZE(9)) mult2_multiplier (
 		.A(out_factor2),
 		.B({sum2[5] ? 3'b111 : 3'b000, sum2}),
-		.S(mult2[17:0])
+		.S(mult2[17:0]),
+		.clk(clk),
+		.resetn(resetn)
 	);
 
 	ADD_LOOKAHEAD #(.SIZE(16)) tot_adder (
