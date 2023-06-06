@@ -3,7 +3,7 @@
 Report : constraint
 Design : zigbee_platform
 Version: J-2014.09-SP2
-Date   : Mon Jun  5 11:06:40 2023
+Date   : Tue Jun  6 09:42:37 2023
 ****************************************
 
 
@@ -39,7 +39,7 @@ Date   : Mon Jun  5 11:06:40 2023
     max_delay/setup                                  0.00 (MET)
     sequential_clock_pulse_width                     0.00 (MET)
     critical_range                                   0.00 (MET)
-    max_area                                     1058892.75
+    max_area                                     1092952.38
                                                           (VIOLATED)
 
 

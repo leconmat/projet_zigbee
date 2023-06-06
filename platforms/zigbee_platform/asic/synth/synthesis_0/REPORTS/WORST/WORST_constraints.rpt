@@ -3,25 +3,25 @@
 Report : constraint
 Design : zigbee_platform
 Version: J-2014.09-SP2
-Date   : Mon Jun  5 11:06:49 2023
+Date   : Tue Jun  6 09:42:59 2023
 ****************************************
 
 
                                                    Weighted
     Group (max_delay/setup)      Cost     Weight     Cost
     -----------------------------------------------------
-    clk                          9.84      1.00      9.84
+    clk                          0.00      1.00      0.00
     default                      0.00      1.00      0.00
     -----------------------------------------------------
-    max_delay/setup                                  9.84
+    max_delay/setup                                  0.00
 
                               Total Neg  Critical
     Group (critical_range)      Slack    Endpoints   Cost
     -----------------------------------------------------
-    clk                         89.54         1      9.84
+    clk                          0.00         0      0.00
     default                      0.00         0      0.00
     -----------------------------------------------------
-    critical_range                                   9.84
+    critical_range                                   0.00
 
                                                    Weighted
     Group (min_delay/hold)       Cost     Weight     Cost
@@ -36,10 +36,10 @@ Date   : Mon Jun  5 11:06:49 2023
     -----------------------------------------------------
     max_transition                                   0.00 (MET)
     max_capacitance                                  0.00 (MET)
-    max_delay/setup                                  9.84 (VIOLATED)
+    max_delay/setup                                  0.00 (MET)
     sequential_clock_pulse_width                     0.00 (MET)
-    critical_range                                   9.84 (VIOLATED)
-    max_area                                     1065221.00
+    critical_range                                   0.00 (MET)
+    max_area                                     1142448.62
                                                           (VIOLATED)
 
 

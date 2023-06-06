@@ -7,7 +7,7 @@ Report : timing
         -sort_by group
 Design : zigbee_platform
 Version: J-2014.09-SP2
-Date   : Mon Jun  5 11:06:50 2023
+Date   : Tue Jun  6 09:43:00 2023
 ****************************************
 
  # A fanout number of 1000 was used for high fanout net computations.
@@ -15,9 +15,9 @@ Date   : Mon Jun  5 11:06:50 2023
 Operating Conditions: WORST   Library: c35_CORELIB_TYP
 Wire Load Model Mode: enclosed
 
-  Startpoint: i_iq_demod/filtre_Q/shift_r/data_out7_reg[0]
+  Startpoint: i_iq_demod/filtre_Q/data_2_1_reg[0]
               (rising edge-triggered flip-flop clocked by clk)
-  Endpoint: i_cordic/qbb_ibuff_reg[4]
+  Endpoint: i_iq_demod/filtre_Q/mult1_multiplier/register_pipe_reg[9][4]
             (rising edge-triggered flip-flop clocked by clk)
   Path Group: clk
   Path Type: max
@@ -30,83 +30,59 @@ Wire Load Model Mode: enclosed
   --------------------------------------------------------------------------
   clock clk (rise edge)                                 0.0000     0.0000
   clock network delay (ideal)                           0.0000     0.0000
-  i_iq_demod/filtre_Q/shift_r/data_out7_reg[0]/C (DFEC3)
-                                                        0.0000 #   0.0000 r
-  i_iq_demod/filtre_Q/shift_r/data_out7_reg[0]/Q (DFEC3)
-                                                        1.1790     1.1790 f
-  U1141/Q (CLKIN6)                                      0.1792     1.3583 r
-  U1140/Q (NOR24)                                       0.1474     1.5056 f
-  i_iq_demod/filtre_Q/dp_cluster_0/add_212/U1_1/CO (ADD32)
-                                                        0.6370     2.1426 f
-  i_iq_demod/filtre_Q/dp_cluster_0/add_212/U1_2/CO (ADD32)
-                                                        0.6720     2.8146 f
-  i_iq_demod/filtre_Q/dp_cluster_0/add_212/U1_3/CO (ADD32)
-                                                        0.6746     3.4892 f
-  i_iq_demod/filtre_Q/dp_cluster_0/add_212/U1_4/CO (ADD32)
-                                                        0.6746     4.1638 f
-  i_iq_demod/filtre_Q/dp_cluster_0/add_212/U1_5/S (ADD32)
-                                                        1.0845     5.2483 r
-  U1901/Q (MUX21)                                       1.0135     6.2618 r
-  U1832/Q (CLKIN0)                                      0.3847     6.6465 f
-  U1129/Q (BUF6)                                        0.5350     7.1816 f
-  U1128/Q (NOR24)                                       0.1403     7.3219 r
-  U1875/Q (CLKIN0)                                      0.4498     7.7718 f
-  U1874/Q (NOR20)                                       0.9917     8.7635 r
-  U1873/Q (AOI210)                                      0.5088     9.2723 f
-  U1562/Q (CLKBU6)                                      0.5815     9.8538 f
-  U1834/Q (CLKIN0)                                      0.7644    10.6182 r
-  U1854/Q (XNR20)                                       1.3027    11.9209 f
-  U1826/Q (MUX21)                                       0.8145    12.7354 f
-  i_iq_demod/filtre_Q/dp_cluster_0/add_7_root_add_232_9/U1_2/S (ADD32)
-                                                        1.1212    13.8566 r
-  i_iq_demod/filtre_Q/dp_cluster_0/add_4_root_add_232_9/U1_2/S (ADD32)
-                                                        1.1046    14.9612 r
-  i_iq_demod/filtre_Q/dp_cluster_0/add_2_root_add_232_9/U1_2/S (ADD32)
-                                                        0.6708    15.6320 f
-  U1587/Q (OAI210)                                      0.4594    16.0913 r
-  U1588/Q (OAI210)                                      0.4575    16.5488 f
-  U1591/Q (OAI210)                                      0.7033    17.2521 r
-  U1592/Q (OAI210)                                      0.4548    17.7069 f
-  U1595/Q (OAI210)                                      0.6971    18.4040 r
-  U1596/Q (OAI210)                                      0.4418    18.8458 f
-  U1597/Q (OAI210)                                      0.6912    19.5371 r
-  U1598/Q (CLKIN0)                                      0.3876    19.9247 f
-  U1599/Q (AOI210)                                      0.7373    20.6620 r
-  U1601/Q (CLKIN0)                                      0.4300    21.0920 f
-  U1602/Q (OAI210)                                      0.6927    21.7847 r
-  U1603/Q (OAI210)                                      0.4418    22.2264 f
-  U1604/Q (OAI210)                                      0.6911    22.9175 r
-  U1605/Q (CLKIN0)                                      0.3876    23.3051 f
-  U1606/Q (AOI210)                                      0.5842    23.8893 r
-  U1561/Q (BUF6)                                        0.3811    24.2704 r
-  U1608/Q (CLKIN0)                                      0.3046    24.5750 f
-  U1609/Q (OAI210)                                      0.5643    25.1394 r
-  U1610/Q (OAI210)                                      0.5782    25.7176 f
-  i_iq_demod/filtre_Q/dp_cluster_0/add_1_root_add_232_9/U1_9/CO (ADD32)
-                                                        0.8417    26.5593 f
-  i_iq_demod/filtre_Q/dp_cluster_0/add_1_root_add_232_9/U1_10/CO (ADD32)
-                                                        0.6728    27.2321 f
-  i_iq_demod/filtre_Q/dp_cluster_0/add_1_root_add_232_9/U1_11/CO (ADD32)
-                                                        0.6721    27.9042 f
-  i_iq_demod/filtre_Q/dp_cluster_0/add_1_root_add_232_9/U1_12/CO (ADD32)
-                                                        0.6721    28.5763 f
-  i_iq_demod/filtre_Q/dp_cluster_0/add_1_root_add_232_9/U1_13/S (ADD32)
-                                                        0.9387    29.5150 r
-  U229/Q (INV6)                                         0.0889    29.6039 f
-  U1123/Q (OAI222)                                      0.2255    29.8294 r
-  i_cordic/qbb_ibuff_reg[4]/D (DFC1)                    0.0001    29.8295 r
-  data arrival time                                               29.8295
+  i_iq_demod/filtre_Q/data_2_1_reg[0]/C (DFC3)          0.0000 #   0.0000 r
+  i_iq_demod/filtre_Q/data_2_1_reg[0]/Q (DFC3)          1.2393     1.2393 f
+  U510/Q (NAND23)                                       0.4860     1.7252 r
+  U508/Q (INV3)                                         0.1799     1.9051 f
+  U220/Q (NAND24)                                       0.3334     2.2385 r
+  U219/Q (NAND24)                                       0.1387     2.3772 f
+  U1874/Q (NOR24)                                       0.3221     2.6994 r
+  U1393/Q (CLKIN6)                                      0.1290     2.8284 f
+  U1391/Q (NAND24)                                      0.2986     3.1270 r
+  U1392/Q (NAND24)                                      0.0951     3.2221 f
+  U878/Q (OAI312)                                       0.4702     3.6923 r
+  U1977/Q (IMAJ31)                                      0.4682     4.1605 f
+  U891/Q (OAI222)                                       0.5937     4.7542 r
+  U210/Q (IMAJ31)                                       0.4801     5.2343 f
+  U1949/Q (OAI222)                                      0.6783     5.9125 r
+  U481/Q (XOR31)                                        0.9213     6.8338 f
+  U275/Q (CLKIN6)                                       0.2503     7.0842 r
+  U411/Q (NAND22)                                       0.1926     7.2768 f
+  U1591/Q (NAND22)                                      0.4970     7.7738 r
+  U1601/Q (NAND22)                                      0.0917     7.8655 f
+  U969/Q (OAI212)                                       0.3679     8.2334 r
+  U817/Q (XOR31)                                        1.2325     9.4659 r
+  U1254/Q (CLKIN3)                                      0.2514     9.7172 f
+  U433/Q (BUF2)                                         0.6850    10.4023 f
+  U890/Q (OAI222)                                       0.2802    10.6825 r
+  U1519/Q (IMAJ31)                                      0.5235    11.2060 f
+  U1935/Q (OAI222)                                      0.7868    11.9928 r
+  U535/Q (MAJ31)                                        0.7264    12.7191 r
+  U979/Q (XNR21)                                        0.7747    13.4939 f
+  U534/Q (INV3)                                         0.4064    13.9003 r
+  U1525/Q (XOR22)                                       0.5982    14.4985 f
+  U1819/Q (XNR22)                                       0.5950    15.0935 f
+  U1854/Q (XOR22)                                       0.5888    15.6823 f
+  U1970/Q (OAI222)                                      0.5345    16.2168 r
+  U1406/Q (MAJ32)                                       0.4009    16.6178 r
+  U1677/Q (XOR31)                                       1.1144    17.7322 r
+  U1785/Q (XNR31)                                       1.2390    18.9712 r
+  U1899/Q (XOR31)                                       1.0145    19.9857 r
+  i_iq_demod/filtre_Q/mult1_multiplier/register_pipe_reg[9][4]/D (DFC1)
+                                                        0.0001    19.9858 r
+  data arrival time                                               19.9858
 
   clock clk (rise edge)                                20.0000    20.0000
   clock network delay (ideal)                           0.0000    20.0000
-  i_cordic/qbb_ibuff_reg[4]/C (DFC1)                    0.0000    20.0000 r
+  i_iq_demod/filtre_Q/mult1_multiplier/register_pipe_reg[9][4]/C (DFC1)
+                                                        0.0000    20.0000 r
   library setup time                                   -0.0128    19.9872
   data required time                                              19.9872
   --------------------------------------------------------------------------
   data required time                                              19.9872
-  data arrival time                                              -29.8295
+  data arrival time                                              -19.9858
   --------------------------------------------------------------------------
-  slack (VIOLATED)                                                -9.8423
+  slack (MET)                                                      0.0014
 
 
 1

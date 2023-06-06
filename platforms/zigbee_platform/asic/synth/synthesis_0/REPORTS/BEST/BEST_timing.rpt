@@ -7,7 +7,7 @@ Report : timing
         -sort_by group
 Design : zigbee_platform
 Version: J-2014.09-SP2
-Date   : Mon Jun  5 11:06:36 2023
+Date   : Tue Jun  6 09:42:31 2023
 ****************************************
 
  # A fanout number of 1000 was used for high fanout net computations.
@@ -15,9 +15,9 @@ Date   : Mon Jun  5 11:06:36 2023
 Operating Conditions: BEST   Library: c35_CORELIB_TYP
 Wire Load Model Mode: enclosed
 
-  Startpoint: i_iq_demod/filtre_Q/shift_r/data_out7_reg[0]
+  Startpoint: i_iq_demod/filtre_I/data_2_2_reg[1]
               (rising edge-triggered flip-flop clocked by clk)
-  Endpoint: i_cordic/qbb_ibuff_reg[4]
+  Endpoint: i_iq_demod/filtre_I/mult2_multiplier/register_pipe_reg[9][4]
             (rising edge-triggered flip-flop clocked by clk)
   Path Group: clk
   Path Type: max
@@ -30,79 +30,79 @@ Wire Load Model Mode: enclosed
   --------------------------------------------------------------------------
   clock clk (rise edge)                                 0.0000     0.0000
   clock network delay (ideal)                           0.0000     0.0000
-  i_iq_demod/filtre_Q/shift_r/data_out7_reg[0]/C (DFEC1)
-                                                        0.0000 #   0.0000 r
-  i_iq_demod/filtre_Q/shift_r/data_out7_reg[0]/QN (DFEC1)
-                                                        0.4644     0.4644 r
-  U1138/Q (NOR21)                                       0.1334     0.5979 f
-  i_iq_demod/filtre_Q/dp_cluster_0/add_212/U1_1/CO (ADD32)
-                                                        0.2134     0.8112 f
-  i_iq_demod/filtre_Q/dp_cluster_0/add_212/U1_2/CO (ADD32)
-                                                        0.2056     1.0168 f
-  i_iq_demod/filtre_Q/dp_cluster_0/add_212/U1_3/CO (ADD32)
-                                                        0.2056     1.2224 f
-  i_iq_demod/filtre_Q/dp_cluster_0/add_212/U1_4/CO (ADD32)
-                                                        0.2056     1.4279 f
-  i_iq_demod/filtre_Q/dp_cluster_0/add_212/U1_5/S (ADD32)
-                                                        0.6739     2.1019 r
-  U1901/Q (MUX21)                                       0.4537     2.5556 r
-  U1832/Q (CLKIN0)                                      0.2355     2.7911 f
-  U1130/Q (NOR21)                                       0.1031     2.8942 r
-  U1875/Q (CLKIN0)                                      0.1621     3.0563 f
-  U1874/Q (NOR20)                                       0.3230     3.3793 r
-  U1873/Q (AOI210)                                      0.1819     3.5613 f
-  U1834/Q (CLKIN0)                                      0.2710     3.8322 r
-  U1854/Q (XNR20)                                       0.3085     4.1408 f
-  U1826/Q (MUX21)                                       0.2556     4.3964 f
-  i_iq_demod/filtre_Q/dp_cluster_0/add_7_root_add_232_9/U1_2/S (ADD32)
-                                                        0.3435     4.7399 r
-  i_iq_demod/filtre_Q/dp_cluster_0/add_4_root_add_232_9/U1_2/S (ADD32)
-                                                        0.3411     5.0810 r
-  i_iq_demod/filtre_Q/dp_cluster_0/add_2_root_add_232_9/U1_2/S (ADD32)
-                                                        0.2863     5.3673 r
-  U1587/Q (OAI210)                                      0.0707     5.4380 f
-  U1588/Q (OAI210)                                      0.2451     5.6831 r
-  U1589/Q (CLKIN0)                                      0.1201     5.8032 f
-  U1592/Q (OAI210)                                      0.2573     6.0605 r
-  U1593/Q (CLKIN0)                                      0.1201     6.1806 f
-  U1596/Q (OAI210)                                      0.2573     6.4379 r
-  U1597/Q (OAI210)                                      0.0846     6.5226 f
-  U1598/Q (CLKIN0)                                      0.1445     6.6671 r
-  U1599/Q (AOI210)                                      0.1577     6.8248 f
-  U1601/Q (CLKIN0)                                      0.1626     6.9874 r
-  U1602/Q (OAI210)                                      0.0841     7.0715 f
-  U1603/Q (OAI210)                                      0.2451     7.3166 r
-  U1604/Q (OAI210)                                      0.0846     7.4012 f
-  U1605/Q (CLKIN0)                                      0.1445     7.5458 r
-  U1606/Q (AOI210)                                      0.1577     7.7034 f
-  U1608/Q (CLKIN0)                                      0.1627     7.8661 r
-  U1609/Q (OAI210)                                      0.0841     7.9502 f
-  U1610/Q (OAI210)                                      0.3073     8.2575 r
-  i_iq_demod/filtre_Q/dp_cluster_0/add_1_root_add_232_9/U1_9/CO (ADD32)
-                                                        0.1982     8.4557 r
-  i_iq_demod/filtre_Q/dp_cluster_0/add_1_root_add_232_9/U1_10/CO (ADD32)
-                                                        0.1794     8.6351 r
-  i_iq_demod/filtre_Q/dp_cluster_0/add_1_root_add_232_9/U1_11/CO (ADD32)
-                                                        0.1792     8.8143 r
-  i_iq_demod/filtre_Q/dp_cluster_0/add_1_root_add_232_9/U1_12/CO (ADD32)
-                                                        0.1792     8.9934 r
-  i_iq_demod/filtre_Q/dp_cluster_0/add_1_root_add_232_9/U1_13/S (ADD32)
-                                                        0.2930     9.2864 r
-  U96/Q (AOI220)                                        0.1143     9.4007 f
-  U95/Q (CLKIN0)                                        0.1622     9.5630 r
-  i_cordic/qbb_ibuff_reg[4]/D (DFC1)                    0.0001     9.5631 r
-  data arrival time                                                9.5631
+  i_iq_demod/filtre_I/data_2_2_reg[1]/C (DFC1)          0.0000 #   0.0000 r
+  i_iq_demod/filtre_I/data_2_2_reg[1]/Q (DFC1)          0.4211     0.4211 f
+  i_iq_demod/filtre_I/sum2_adder/U20/Q (XNR20)          0.3924     0.8135 r
+  U488/Q (XOR21)                                        0.5179     1.3314 r
+  i_iq_demod/filtre_I/mult2_multiplier/U30/Q (NOR20)    0.2214     1.5528 f
+  i_iq_demod/filtre_I/mult2_multiplier/genblk1[1].adder/U38/Q (XNR20)
+                                                        0.3638     1.9166 f
+  i_iq_demod/filtre_I/mult2_multiplier/genblk1[1].adder/U33/Q (OAI310)
+                                                        0.3214     2.2380 r
+  U269/Q (IMAJ31)                                       0.1197     2.3577 f
+  i_iq_demod/filtre_I/mult2_multiplier/genblk1[1].adder/U24/Q (OAI220)
+                                                        0.3225     2.6802 r
+  i_iq_demod/filtre_I/mult2_multiplier/genblk1[1].adder/U22/Q (XNR20)
+                                                        0.3583     3.0385 r
+  i_iq_demod/filtre_I/mult2_multiplier/genblk1[2].adder/U28/Q (XNR20)
+                                                        0.3692     3.4077 f
+  i_iq_demod/filtre_I/mult2_multiplier/genblk1[2].adder/U24/Q (OAI220)
+                                                        0.3060     3.7138 r
+  i_iq_demod/filtre_I/mult2_multiplier/genblk1[2].adder/U20/Q (AOI220)
+                                                        0.1756     3.8894 f
+  i_iq_demod/filtre_I/mult2_multiplier/genblk1[2].adder/U15/Q (OAI220)
+                                                        0.3335     4.2228 r
+  i_iq_demod/filtre_I/mult2_multiplier/genblk1[2].adder/U13/Q (XNR20)
+                                                        0.3583     4.5811 r
+  i_iq_demod/filtre_I/mult2_multiplier/genblk1[3].adder/U19/Q (XNR20)
+                                                        0.3692     4.9503 f
+  i_iq_demod/filtre_I/mult2_multiplier/genblk1[3].adder/U15/Q (OAI220)
+                                                        0.3177     5.2680 r
+  U355/Q (XOR31)                                        0.4687     5.7368 r
+  i_iq_demod/filtre_I/mult2_multiplier/genblk1[4].adder/U19/Q (XNR20)
+                                                        0.3424     6.0791 f
+  i_iq_demod/filtre_I/mult2_multiplier/genblk1[4].adder/U15/Q (OAI220)
+                                                        0.3293     6.4084 r
+  i_iq_demod/filtre_I/mult2_multiplier/genblk1[4].adder/U13/Q (XNR20)
+                                                        0.3583     6.7667 r
+  i_iq_demod/filtre_I/mult2_multiplier/genblk1[5].adder/U19/Q (XNR20)
+                                                        0.3692     7.1359 f
+  i_iq_demod/filtre_I/mult2_multiplier/genblk1[5].adder/U15/Q (OAI220)
+                                                        0.3294     7.4653 r
+  i_iq_demod/filtre_I/mult2_multiplier/genblk1[5].adder/U13/Q (XNR20)
+                                                        0.3583     7.8236 r
+  i_iq_demod/filtre_I/mult2_multiplier/genblk1[6].adder/U19/Q (XNR20)
+                                                        0.3692     8.1928 f
+  i_iq_demod/filtre_I/mult2_multiplier/genblk1[6].adder/U15/Q (OAI220)
+                                                        0.3060     8.4988 r
+  i_iq_demod/filtre_I/mult2_multiplier/genblk1[6].adder/U13/Q (XNR20)
+                                                        0.3693     8.8681 f
+  i_iq_demod/filtre_I/mult2_multiplier/genblk1[7].adder/U19/Q (XNR20)
+                                                        0.3683     9.2364 r
+  i_iq_demod/filtre_I/mult2_multiplier/genblk1[7].adder/U18/Q (XOR20)
+                                                        0.3164     9.5527 r
+  i_iq_demod/filtre_I/mult2_multiplier/genblk1[8].adder/U23/Q (XNR20)
+                                                        0.3635     9.9162 r
+  i_iq_demod/filtre_I/mult2_multiplier/genblk1[8].adder/U21/Q (CLKIN0)
+                                                        0.1181    10.0343 f
+  i_iq_demod/filtre_I/mult2_multiplier/genblk1[8].adder/U20/Q (AOI220)
+                                                        0.1722    10.2065 r
+  U435/Q (XNR31)                                        0.3985    10.6050 r
+  i_iq_demod/filtre_I/mult2_multiplier/register_pipe_reg[9][4]/D (DFC1)
+                                                        0.0001    10.6051 r
+  data arrival time                                               10.6051
 
   clock clk (rise edge)                                20.0000    20.0000
   clock network delay (ideal)                           0.0000    20.0000
-  i_cordic/qbb_ibuff_reg[4]/C (DFC1)                    0.0000    20.0000 r
+  i_iq_demod/filtre_I/mult2_multiplier/register_pipe_reg[9][4]/C (DFC1)
+                                                        0.0000    20.0000 r
   library setup time                                   -0.0097    19.9903
   data required time                                              19.9903
   --------------------------------------------------------------------------
   data required time                                              19.9903
-  data arrival time                                               -9.5631
+  data arrival time                                              -10.6051
   --------------------------------------------------------------------------
-  slack (MET)                                                     10.4273
+  slack (MET)                                                      9.3852
 
 
 1
