@@ -9,18 +9,7 @@
 `define Q9 9'h063
 `define Q10 9'h0C1
 
-/*`define Q1 6'h00
-`define Q2 6'h3F
-`define Q3 6'h00
-`define Q4 6'h02
-`define Q5 6'h02
-`define Q6 6'h3E
-`define Q7 6'h3B
-`define Q8 6'h00
-`define Q9 6'h0C
-`define Q10 6'h18*/
-
-module filter_20(
+module filter_20 (
 
 	input logic clk,
 	input logic resetn,
@@ -29,208 +18,219 @@ module filter_20(
 	output logic signed [4:0] data_out,
 	output bit out_valid
 );
-//popo
-	logic signed [4:0] data_1_1_1, data_2_1_1,data_1_2_1, data_2_2_1,
-			   data_1_1_2, data_2_1_2,data_1_2_2, data_2_2_2,
-			   data_1_1_3, data_2_1_3,data_1_2_3, data_2_2_3,
-			   data_1_1_4, data_2_1_4,data_1_2_4, data_2_2_4,
-			   data_1_1_5, data_2_1_5,data_1_2_5, data_2_2_5;
 
-	logic signed [8:0] out_factor1, out_factor2 ,out_factor3, out_factor4,out_factor5, out_factor6,out_factor7, out_factor8,out_factor9, out_factor10 ;
+logic signed [4:0] data_1_1, data_2_1, data_1_2, data_2_2;
+logic signed [4:0] data_1_1_req, data_2_1_req, data_1_2_req, data_2_2_req;
+logic signed [8:0] out_factor1, out_factor2;
+logic signed [8:0] out_factor1_req, out_factor2_req;
+logic signed [17:0] mult1,mult2;
+logic signed [15:0] tot;
+logic signed [17:0] temp, n_temp;
+logic signed [5:0] sum1, sum2;
+logic [2:0] sel;
+logic signed [4:0] shift_reg0, shift_reg1, shift_reg2, shift_reg3, shift_reg4, shift_reg5, shift_reg6, shift_reg7, shift_reg8, shift_reg9,shift_reg10, shift_reg11, shift_reg12, shift_reg13, shift_reg14, shift_reg15, shift_reg16, shift_reg17, shift_reg18, shift_reg19;
 
-	logic signed [13:0] mult1_1, mult2_1,mult1_2, mult2_2,mult1_3, mult2_3,mult1_4, mult2_4,mult1_5, mult2_5;
-	logic signed [16:0] tot;
-	logic signed [5:0] sum1_1, sum2_1,sum1_2, sum2_2,sum1_3, sum2_3,sum1_4, sum2_4,sum1_5, sum2_5;
-	logic [2:0] sel;
-	logic [2:0] shift_count;
-	/*
-	mux # (.SIZE(5)) data_reg1 (
-		    .in_0(shift_reg0),
-		    .in_1(shift_reg1),
-		    .in_2(shift_reg2),
-		    .in_3(shift_reg3),
-		    .in_4(shift_reg4),
-		    .in_5(shift_reg5),
-		    .in_6(shift_reg6),
-		    .in_7(shift_reg7),
-		    .in_8(shift_reg8),
-		    .in_9(shift_reg9),
-		    .sel(sel),
-		    .out1(data_1_1),
-		    .out2(data_2_1)
-	);
+logic [2:0] shift_count;
 
-	mux # (.SIZE(5)) data_reg2 (
-		    .in_0(shift_reg19),
-		    .in_1(shift_reg18),
-		    .in_2(shift_reg17),
-		    .in_3(shift_reg16),
-		    .in_4(shift_reg15),
-		    .in_5(shift_reg14),
-		    .in_6(shift_reg13),
-		    .in_7(shift_reg12),
-		    .in_8(shift_reg11),
-		    .in_9(shift_reg10),
-		    .sel(sel),
-		    .out1(data_1_2),
-		    .out2(data_2_2)
-	);
+always @(posedge clk, negedge resetn)
+begin
+	if(~resetn)
+	begin
+		data_1_1 <= 0;
+		data_2_1 <= 0;
+		data_1_2 <= 0;
+		data_2_2 <= 0;
+		out_factor1 <= 0;
+		out_factor2 <= 0;
+	end
+	else
+	begin
+		data_1_1 <= data_1_1_req;
+		data_2_1 <= data_2_1_req;
+		data_1_2 <= data_1_2_req;
+		data_2_2 <= data_2_2_req;
+		out_factor1 <= out_factor1_req;
+		out_factor2 <= out_factor2_req;
+	end
+end
 
-	mux # (.SIZE(9)) factor (
-		    .in_0(`Q1),
-		    .in_1(`Q2),
-		    .in_2(`Q3),
-		    .in_3(`Q4),
-		    .in_4(`Q5),
-		    .in_5(`Q6),
-		    .in_6(`Q7),
-		    .in_7(`Q8),
-		    .in_8(`Q9),
-		    .in_9(`Q10),
-		    .sel(sel),
-		    .out1(out_factor1),
-		    .out2(out_factor2)
-	);*/
+mux # (.SIZE(5)) data_reg1 (.in_0(shift_reg0),
+	    .in_1(shift_reg1),
+	    .in_2(shift_reg2),
+	    .in_3(shift_reg3),
+	    .in_4(shift_reg4),
+	    .in_5(shift_reg5),
+	    .in_6(shift_reg6),
+	    .in_7(shift_reg7),
+	    .in_8(shift_reg8),
+	    .in_9(shift_reg9),
+	    .sel(sel),
+	    .out1(data_1_1_req),
+	    .out2(data_2_1_req)
+);
 
-	shift_register_20 shift_r (
-				.clk(clk),
-				.reset(resetn),
-				.data_in(data_in),
-				.data_shift_en(in_valid),
-				.data_out0(data_1_1_1),
-				.data_out1(data_1_2_1),
-				.data_out2(data_1_1_2),
-				.data_out3(data_1_2_2),
-				.data_out4(data_1_1_3),
-				.data_out5(data_1_2_3),
-				.data_out6(data_1_1_4),
-				.data_out7(data_1_2_4),
-				.data_out8(data_1_1_5),
-				.data_out9(data_1_2_5),
-				.data_out10(data_2_2_5),
-				.data_out11(data_2_1_5),
-				.data_out12(data_2_2_4),
-				.data_out13(data_2_1_4),
-				.data_out14(data_2_2_3),
-				.data_out15(data_2_1_3),
-				.data_out16(data_2_2_2),
-				.data_out17(data_2_1_2),
-				.data_out18(data_2_2_1),
-				.data_out19(data_2_1_1),
-				.cpt_shift(shift_count)
-	);
+mux # (.SIZE(5)) data_reg2 (.in_0(shift_reg19),
+	    .in_1(shift_reg18),
+	    .in_2(shift_reg17),
+	    .in_3(shift_reg16),
+	    .in_4(shift_reg15),
+	    .in_5(shift_reg14),
+	    .in_6(shift_reg13),
+	    .in_7(shift_reg12),
+	    .in_8(shift_reg11),
+	    .in_9(shift_reg10),
+	    .sel(sel),
+	    .out1(data_1_2_req),
+	    .out2(data_2_2_req)
+);
 
-	
-	/*mac mac1 (
-		.data_in(sum1_pipe),
-		.data_out(mult1),
-		.factor_in(out_factor1_pipe)
-	);	
-	mac mac2 (
-		.data_in(sum2_pipe),
-		.data_out(mult2),
-		.factor_in(out_factor2_pipe)
-	);*/	
+mux # (.SIZE(9)) factor (
+	    .in_0(`Q1),
+	    .in_1(`Q2),
+	    .in_2(`Q3),
+	    .in_3(`Q4),
+	    .in_4(`Q5),
+	    .in_5(`Q6),
+	    .in_6(`Q7),
+	    .in_7(`Q8),
+	    .in_8(`Q9),
+	    .in_9(`Q10),
+	    .sel(sel),
+	    .out1(out_factor1_req),
+	    .out2(out_factor2_req)
+);
 
-	typedef enum  {
-	  INIT, ZERO, ONE, TWO, THREE, FOUR
-	   } fsm_t;
+shift_register_20 shift_r (.clk(clk),
+			.reset(resetn),
+			.data_in(data_in),
+			.data_shift_en(in_valid),
+			.data_out0(shift_reg0),
+			.data_out1(shift_reg1),
+			.data_out2(shift_reg2),
+			.data_out3(shift_reg3),
+			.data_out4(shift_reg4),
+			.data_out5(shift_reg5),
+			.data_out6(shift_reg6),
+			.data_out7(shift_reg7),
+			.data_out8(shift_reg8),
+			.data_out9(shift_reg9),
+			.data_out10(shift_reg10),
+			.data_out11(shift_reg11),
+			.data_out12(shift_reg12),
+			.data_out13(shift_reg13),
+			.data_out14(shift_reg14),
+			.data_out15(shift_reg15),
+			.data_out16(shift_reg16),
+			.data_out17(shift_reg17),
+			.data_out18(shift_reg18),
+			.data_out19(shift_reg19),
+			.cpt_shift(shift_count)
+);
 
-	fsm_t current_state, next_state;
+typedef enum  {
+  INIT, ZERO, ONE, TWO, THREE, FOUR
+   } fsm_t;
+
+fsm_t current_state, next_state;
 
 
-	always_ff @(posedge clk, negedge resetn)
+ always_ff @(posedge clk, negedge resetn)
 	begin
 	     if(~resetn) begin
 		current_state <= INIT;
 		out_valid <= 0;
+		data_out <= 'b0;
+		temp <= 'b0;
 	     end
 	     else 
-	     begin
-			if (shift_count == 3'b100) begin
-
+		begin
+			if (shift_count == 3'b010) begin 
+				data_out <= temp[13:9];
+				temp <= tot;
 				out_valid <= 1'b1;
 			end
 			else begin
+				temp <= n_temp;
 				out_valid <= 1'b0;
 			end
 		current_state <= next_state;
-	     end
+		end
 	end 
 
-	always_comb
+ADD_LOOKAHEAD #(.SIZE(18)) temp_adder (
+		.A(temp),
+		.B({tot[15] ? 2'b11 : 2'b00, tot}),
+		.S(n_temp)
+	);
+
+always_comb
 	begin
 	     unique case(current_state)
 		INIT:
 		    begin
-			sel <= 3'b000;
-			next_state <= ZERO;
+			sel = 3'b000;
+			next_state = ZERO;
 		    end
 		ZERO:
 		     begin
-			sel <= 3'b000;
-			next_state <= ONE;
+			sel = 3'b000;
+			next_state = ONE;
 			end
 		ONE:
 		     begin
-			sel <= 3'b001;
-			next_state <= TWO;			
+			sel = 3'b001;
+			next_state = TWO;			
 			end
 		TWO:
 		     begin
-			sel <= 3'b010;
-			next_state <= THREE;		
+			sel = 3'b010;
+			next_state = THREE;		
 			end
 		THREE:
 		     begin
-			sel <= 3'b011;
-			next_state <= FOUR;
+			sel = 3'b011;
+			next_state = FOUR;
 			end
 		FOUR:
 		     begin
-			sel <= 3'b100;
-			next_state <= ZERO;
+			sel = 3'b100;
+			next_state = ZERO;
 			end
-		default:
-		begin
-			sel <= 3'b000;
-			next_state <= INIT;
-		end
-	      endcase
+		endcase
 	end
 
-	assign sum1_1 = data_1_1_1 + data_2_1_1;
-	assign sum2_1 = data_1_2_1 + data_2_2_1;
+	ADD_LOOKAHEAD #(.SIZE(6)) sum1_adder (
+		.A({data_1_1[4], data_1_1}),
+		.B({data_2_1[4], data_2_1}),
+		.S(sum1[5:0])
+	);
 
-	assign sum1_2 = data_1_1_2 + data_2_1_2;
-	assign sum2_2 = data_1_2_2 + data_2_2_2;
+	ADD_LOOKAHEAD #(.SIZE(6)) sum2_adder (
+		.A({data_1_2[4], data_1_2}),
+		.B({data_2_2[4], data_2_2}),
+		.S(sum2[5:0])
+	);
 
-	assign sum1_3 = data_1_1_3 + data_2_1_3;
-	assign sum2_3 = data_1_2_3 + data_2_2_3;
+	MULT_LOOKAHEAD #(.SIZE(9)) mult1_multiplier (
+		.A(out_factor1),
+		.B({sum1[5] ? 3'b111 : 3'b000, sum1}),
+		.S(mult1[17:0]),
+		.clk(clk),
+		.resetn(resetn)
+	);
 
-	assign sum1_4 = data_1_1_4 + data_2_1_4;
-	assign sum2_4 = data_1_2_4 + data_2_2_4;
+	MULT_LOOKAHEAD #(.SIZE(9)) mult2_multiplier (
+		.A(out_factor2),
+		.B({sum2[5] ? 3'b111 : 3'b000, sum2}),
+		.S(mult2[17:0]),
+		.clk(clk),
+		.resetn(resetn)
+	);
 
-	assign sum1_5 = data_1_1_5 + data_2_1_5;
-	assign sum2_5 = data_1_2_5 + data_2_2_5;
-
-	assign mult1_1 = 1 * sum1_1;
-	assign mult2_1 = -9 * sum2_1;
-
-	assign mult1_2 = -2 * sum1_2;
-	assign mult2_2 = 13 * sum2_2;
-
-	assign mult1_3 = 14 * sum1_3;
-	assign mult2_3 = -14 * sum2_3;
-
-	assign mult1_4 = -39 * sum1_4;
-	assign mult2_4 = -3 * sum2_4;
-
-	assign mult1_5 = 99 * sum1_5;
-	assign mult2_5 = 193 * sum2_5;
-
-	assign tot = mult1_1 + mult2_1 + mult1_2 + mult2_2 + mult1_3 + mult2_3 + mult1_4 + mult2_4 + mult1_5 + mult2_5;
-	
-	assign data_out = tot[13:9];
+	ADD_LOOKAHEAD #(.SIZE(16)) tot_adder (
+		.A({mult1[14], mult1[14:0]}),
+		.B({mult2[14], mult2[14:0]}),
+		.S(tot[15:0])
+	);
 
 endmodule
