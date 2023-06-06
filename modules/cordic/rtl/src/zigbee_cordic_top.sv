@@ -35,99 +35,102 @@ module zigbee_cordic_top (
 	output wire oValid;
 
 	// DFF buffer for IOs
-	reg [IQ_SIZE-1:0] ibb_ibuff, qbb_ibuff;
-	reg [W_SIZE-1:0] wout_obuff;
+	reg signed [IQ_SIZE-1:0] ibb_ibuff, qbb_ibuff;
+	reg signed [W_SIZE-1:0] wout_obuff;
 	reg iValid_ibuff;
 	reg oValid_obuff;
 
 	// Cordic stages wires
 	// 1 wires stage more than number of cordic stages
-	logic [IQ_SIZE+1-1:0] cor_x_s0 [2-1+1:0];
-	logic [IQ_SIZE+1-1:0] cor_y_s0 [2-1+1:0];
-	logic [W_SIZE-1:0] cor_w_s0 [2-1+1:0];
+	logic signed [IQ_SIZE+1-1:0] cor_x_s0 [2-1+1:0];
+	logic signed [IQ_SIZE+1-1:0] cor_y_s0 [2-1+1:0];
+	logic signed [W_SIZE-1:0] cor_w_s0 [2-1+1:0];
 	
-	logic [IQ_SIZE+1-1:0] cor_x_s1 [NUM_STAGES-1+1:2];
-	logic [IQ_SIZE+1-1:0] cor_y_s1 [NUM_STAGES-1+1:2];
-	logic [W_SIZE-1:0] cor_w_s1 [NUM_STAGES-1+1:2];
+	// No registers for x and y at the last stage
+	logic signed [IQ_SIZE+1-1:0] cor_x_s1 [NUM_STAGES-1:2];
+	logic signed [IQ_SIZE+1-1:0] cor_y_s1 [NUM_STAGES-1:2];
+	logic signed [W_SIZE-1:0] cor_w_s1 [NUM_STAGES-1+1:2];
 
 	logic valid_s0 [2-1+1:0];
 	logic valid_s1 [NUM_STAGES-1+1:2];
-
-	always @(posedge clk, negedge reset_n) begin
-		if(!reset_n) begin
-			cor_x_s1[2] <= 0;
-			cor_y_s1[2] <= 0;
-			cor_w_s1[2] <= 0;
-			valid_s1[2] <= 0;
-		end
-		else begin
-			if (ibb_ibuff[IQ_SIZE-1]) begin
-				cor_x_s0[0] <= {1'b0, -ibb_ibuff};
-				cor_y_s0[0] <= {(!qbb_ibuff[IQ_SIZE-1]) && (qbb_ibuff != 0), -qbb_ibuff};
-				cor_w_s0[0] <= {1'b1, {W_SIZE-1{1'b0}}}; // 180 degrees
-			end
-			else begin
-				cor_x_s0[0] <= {1'b0, ibb_ibuff};
-				cor_y_s0[0] <= {qbb_ibuff[IQ_SIZE-1], qbb_ibuff};
-				cor_w_s0[0] <= {W_SIZE{1'b0}};
-			end
-		
-			valid_s0[0] <= iValid_ibuff;
-
-			cor_x_s1[2] <= cor_x_s0[2];
-			cor_y_s1[2] <= cor_y_s0[2];
-			cor_w_s1[2] <= cor_w_s0[2];
-			valid_s1[2] <= valid_s0[2];
-		end
-	end
-
+	
 
 
 	//////////////////////////////////////////////////////////////////////////////////////////////
 	// Cordic stages instantiation
 	//////////////////////////////////////////////////////////////////////////////////////////////
-	genvar iStage;
-	generate
-		for (iStage = 0; iStage < 2; iStage = iStage + 1) begin : zigbee_cordic_stage_gen_s0
-			zigbee_cordic_stage_comb #(
-				.NUM_STAGE(iStage),
+	zigbee_cordic_stage_comb #(
+				.NUM_STAGE(0),
 				.XY_SIZE(IQ_SIZE + 1),
 				.W_SIZE(W_SIZE),
-				.CONST_TAN(1 << (NUM_STAGES - iStage - 1))
-				) stage (
+				.CONST_TAN(1 << (NUM_STAGES - 1))
+				) S0 (
 				// Inputs
-				.xin(cor_x_s0[iStage]),
-				.yin(cor_y_s0[iStage]),
-				.win(cor_w_s0[iStage]),
-				.validIn(valid_s0[iStage]),
+				.xin(cor_x_s0[0]),
+				.yin(cor_y_s0[0]),
+				.win(cor_w_s0[0]),
+				.validIn(valid_s0[0]),
 				// Outputs
-				.xout(cor_x_s0[iStage + 1]),
-				.yout(cor_y_s0[iStage + 1]),
-				.wout(cor_w_s0[iStage + 1]),
-				.validOut(valid_s0[iStage + 1])
+				.xout(cor_x_s0[1]),
+				.yout(cor_y_s0[1]),
+				.wout(cor_w_s0[1]),
+				.validOut(valid_s0[1])
 				);
-		end
-
-		for (iStage = 2; iStage < NUM_STAGES; iStage = iStage + 1) begin : zigbee_cordic_stage_gen_s1
-			zigbee_cordic_stage_comb #(
-				.NUM_STAGE(iStage),
+	
+				
+	zigbee_cordic_stage_comb #(
+				.NUM_STAGE(1),
 				.XY_SIZE(IQ_SIZE + 1),
 				.W_SIZE(W_SIZE),
-				.CONST_TAN(1 << (NUM_STAGES - iStage - 1))
-				) stage (
+				.CONST_TAN(1 << (NUM_STAGES - 2))
+				) S1 (
 				// Inputs
-				.xin(cor_x_s1[iStage]),
-				.yin(cor_y_s1[iStage]),
-				.win(cor_w_s1[iStage]),
-				.validIn(valid_s1[iStage]),
+				.xin(cor_x_s0[1]),
+				.yin(cor_y_s0[1]),
+				.win(cor_w_s0[1]),
+				.validIn(valid_s0[1]),
 				// Outputs
-				.xout(cor_x_s1[iStage + 1]),
-				.yout(cor_y_s1[iStage + 1]),
-				.wout(cor_w_s1[iStage + 1]),
-				.validOut(valid_s1[iStage + 1])
+				.xout(cor_x_s0[2]),
+				.yout(cor_y_s0[2]),
+				.wout(cor_w_s0[2]),
+				.validOut(valid_s0[2])
 				);
-		end
-	endgenerate
+				
+	zigbee_cordic_stage_comb #(
+				.NUM_STAGE(2),
+				.XY_SIZE(IQ_SIZE + 1),
+				.W_SIZE(W_SIZE),
+				.CONST_TAN(1 << (NUM_STAGES - 3))
+				) S2 (
+				// Inputs
+				.xin(cor_x_s1[2]),
+				.yin(cor_y_s1[2]),
+				.win(cor_w_s1[2]),
+				.validIn(valid_s1[2]),
+				// Outputs
+				.xout(cor_x_s1[3]),
+				.yout(cor_y_s1[3]),
+				.wout(cor_w_s1[3]),
+				.validOut(valid_s1[3])
+				);
+				
+	zigbee_cordic_stage_comb #(
+				.NUM_STAGE(3),
+				.XY_SIZE(IQ_SIZE + 1),
+				.W_SIZE(W_SIZE),
+				.CONST_TAN(1 << (NUM_STAGES - 4))
+				) S3 (
+				// Inputs
+				.xin(cor_x_s1[3]),
+				.yin(cor_y_s1[3]),
+				.win(cor_w_s1[3]),
+				.validIn(valid_s1[3]),
+				// Outputs
+				.xout(),
+				.yout(),
+				.wout(cor_w_s1[4]),
+				.validOut(valid_s1[4])
+				);
 
 
 
@@ -142,6 +145,11 @@ module zigbee_cordic_top (
 			qbb_ibuff <= 0;
 			wout_obuff <= 0;
 			oValid_obuff <= 0;
+			
+			cor_x_s1[2] <= 0;
+			cor_y_s1[2] <= 0;
+			cor_w_s1[2] <= 0;
+			valid_s1[2] <= 0;
 		end
 		else begin
 			iValid_ibuff <= iValid;
@@ -149,8 +157,22 @@ module zigbee_cordic_top (
 			qbb_ibuff <= qbb;
 			wout_obuff <= cor_w_s1[NUM_STAGES];
 			oValid_obuff <= valid_s1[NUM_STAGES];
+
+			cor_x_s1[2] <= cor_x_s0[2];
+			cor_y_s1[2] <= cor_y_s0[2];
+			cor_w_s1[2] <= cor_w_s0[2];
+			valid_s1[2] <= valid_s0[2];
 		end
 	end
+	
+	assign valid_s0[0] = iValid_ibuff;
+
+	assign cor_y_s0[0] = ibb_ibuff[IQ_SIZE-1] ? $signed({(!qbb_ibuff[IQ_SIZE-1]) && (qbb_ibuff != 0), -qbb_ibuff}) :
+								  				$signed({qbb_ibuff[IQ_SIZE-1], qbb_ibuff});
+				
+	assign cor_x_s0[0] = $signed({1'b0, (ibb_ibuff[IQ_SIZE-1]) ? -ibb_ibuff : ibb_ibuff});
+
+	assign cor_w_s0[0] = $signed({ibb_ibuff[IQ_SIZE-1], {W_SIZE-1{1'b0}}});
 
 	// Output assignation
 	assign wout = wout_obuff;
