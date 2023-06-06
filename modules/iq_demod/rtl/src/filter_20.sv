@@ -139,12 +139,13 @@ fsm_t current_state, next_state;
 	     if(~resetn) begin
 		current_state <= INIT;
 		out_valid <= 0;
+		data_out <= 'b0;
+		temp <= 'b0;
 	     end
 	     else 
 		begin
-			if (shift_count == 3'b000) begin 
+			if (shift_count == 3'b010) begin 
 				data_out <= temp[13:9];
-				
 				temp <= tot;
 				out_valid <= 1'b1;
 			end
