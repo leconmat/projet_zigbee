@@ -8,7 +8,7 @@ source /softslin/configCAO/Synopsys/config_DesignVision
 
 source /softslin/configCAO/Cadence/licence_cadence
 source /softslin/configCAO/Cadence/config_Virtuoso
-source /softslin/configCAO/Cadence/cWAVE_FILE = simulation.wlfonfig_Innovus_17
+source /softslin/configCAO/Cadence/config_Innovus_19
 source /softslin/configCAO/Cadence/config_QRC
 
 source /softslin/configCAO/MentorGraphics/config_Calibre

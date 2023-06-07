@@ -7,7 +7,7 @@
 
 # Set IP name
 IPname=$(echo $PWD | sed -e 's/^.*\/modules\/\(.*\)\/.*/\1/')
-
+echo $IPname
 
 echo "#########################################"
 echo "## Run simulation flow for $IPname"
