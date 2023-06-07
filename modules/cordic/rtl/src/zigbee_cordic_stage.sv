@@ -7,7 +7,7 @@
 //////////////////////////////////////////////////////////////////////////////////////////////
 module zigbee_cordic_stage_comb 
 	#(parameter integer NUM_STAGE = 1, XY_SIZE = 1, W_SIZE = 0,
-	  parameter [W_SIZE-1:0] CONST_TAN = 4) 
+	  parameter signed [W_SIZE-1:0] CONST_TAN = 4) 
         (
 	// Inputs
 	xin,

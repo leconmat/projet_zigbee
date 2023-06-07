@@ -11,6 +11,7 @@ module zigbee_cordic_tb;
 	parameter integer IQ_SIZE = 5;
 	parameter integer W_SIZE = 6;
 	parameter integer AMPLITUDE = 15;
+	parameter integer NB_POINTS = 10000;
 	parameter real PI = 3.14159265359;
 	
 	real maxError;
@@ -56,10 +57,9 @@ module zigbee_cordic_tb;
 	
 	// DUT random stimuli angle generator
 	initial begin
-		reset_n = 1'b0;
-		#750ns reset_n = 1'b1;
-		forever begin
-			angleRad = $itor($urandom_range(2 * PI * 10000)) / 10000;
+		reset_n = 0;
+		#555ns reset_n = 1;
+		for (angleRad = 0; angleRad < 2*PI; angleRad = angleRad + 2*PI/NB_POINTS) begin
 			angleDeg = (angleRad * 360) / (2 * PI);
 			iValid <= 1;
 			#200ns;
@@ -67,5 +67,6 @@ module zigbee_cordic_tb;
 			if((deltaError > 0 ? deltaError : -deltaError) > maxError)
 				maxError = deltaError > 0 ? deltaError : -deltaError;
 		end
+		$stop;
 	end
 endmodule
