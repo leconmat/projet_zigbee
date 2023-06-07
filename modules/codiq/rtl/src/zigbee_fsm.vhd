@@ -28,8 +28,8 @@ architecture Behavioral of zigbee_fsm is
     type mem_t_I is array(4 downto 0) of std_logic_vector(3 downto 0); -- rom I
     type mem_t_Q is array(4 downto 0) of std_logic_vector(3 downto 0); -- rom Q
 
-    signal C_STATE     : StateType;        	 					-- etat actuel (current state)
-    signal N_STATE     : StateType;          					-- etat suivant (next state)
+    signal C_STATE     : StateType;        	 	-- etat actuel (current state)
+    signal N_STATE     : StateType;          		-- etat suivant (next state)
 
     signal cpt_old  		: std_logic_vector(2 downto 0);		-- variable precedente compteur
     signal cpt      		: std_logic_vector(2 downto 0);		-- variable d increment compteur
@@ -173,7 +173,7 @@ begin
 		end if;
 	end process en_dac_assign;
 				
---*********************************************************************************
+	--*********************************************************************************
 
 	rst_IBB_QBB : process(resetn, clk)
 	begin
@@ -216,7 +216,7 @@ begin
         N_STATE <= C_STATE;
 
         case C_STATE is
-            --*********************************************************************************
+	--*********************************************************************************
             when RST_STATE =>
                 if(mem_state = '1' and dac_ready = '1' and en = '1' and en_prev = '0') then
                     N_STATE <= INIT;
@@ -224,7 +224,7 @@ begin
                     N_STATE <= RST_STATE;
                 end if;
 
-            --*********************************************************************************
+	--*********************************************************************************
             when INIT =>
 				if(dac_ready = '0') then
 					N_STATE <= INIT;
@@ -258,7 +258,7 @@ begin
                		end if;
 				end if;
 
-            --*********************************************************************************
+	--*********************************************************************************
             when Q =>
 				if(dac_ready = '0') then
 					N_STATE <= Q;
@@ -275,9 +275,9 @@ begin
 					end if;
                 end if;
 
-            --*********************************************************************************              
-            when others =>
-                N_STATE <= RST_STATE;
+	--*********************************************************************************              
+            --when others =>
+                --N_STATE <= RST_STATE;
 
         end case;
 
@@ -304,7 +304,7 @@ begin
 					cpt_next	<= cpt;
                 end if;
 		
-            --*********************************************************************************
+	--*********************************************************************************
             when INIT =>
 				cpt_next 		<= cpt;
                 S_QBB 			<= temp_QBB;
@@ -356,7 +356,7 @@ begin
 					S_QBB		<= temp_QBB;
 				end if;
 
-            --*********************************************************************************
+	--*********************************************************************************
             when I =>
 				cpt_next 		<= cpt;
                 S_QBB 			<= temp_QBB;
@@ -420,7 +420,7 @@ begin
 					S_QBB		<= temp_QBB;
 				end if;
 
-            --*********************************************************************************
+	--*********************************************************************************
             when Q =>
 				cpt_next 		<= cpt;
                 S_QBB 			<= temp_QBB;
@@ -484,15 +484,15 @@ begin
 					S_QBB		<= temp_QBB;
 				end if;
 
-            --*********************************************************************************              
-            when others => 	
-					S_AQ_next	<= S_AQ;
-                    S_AI_next	<= S_AI;
-					cpt_next 	<= cpt;
-					S_IBB		<= temp_IBB;
-					S_QBB		<= temp_QBB;
+	--*********************************************************************************              
+            --when others => 	
+					--S_AQ_next	<= S_AQ;
+                    --S_AI_next	<= S_AI;
+					--cpt_next 	<= cpt;
+					--S_IBB		<= temp_IBB;
+					--S_QBB		<= temp_QBB;
 
-            --********************************************************************************* 
+	--********************************************************************************* 
         end case;
 
     end process FSM_OUTPUTS;

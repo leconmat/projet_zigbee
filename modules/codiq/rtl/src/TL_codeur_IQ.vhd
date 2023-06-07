@@ -21,7 +21,7 @@ end TL_codeur_IQ;
 
 architecture TL_codeur_IQ_arch of TL_codeur_IQ is
 
-  signal en_10MHz : std_logic := '0';
+  signal en_10MHz : std_logic;
 
 component zigbee_fsm is
     port
