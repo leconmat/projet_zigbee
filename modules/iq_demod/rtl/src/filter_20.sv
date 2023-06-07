@@ -165,7 +165,7 @@ ADD_LOOKAHEAD #(.SIZE(18)) temp_adder (
 
 always_comb
 	begin
-	     unique case(current_state)
+	     case(current_state)
 		INIT:
 		    begin
 			sel = 3'b000;
@@ -193,6 +193,11 @@ always_comb
 			end
 		FOUR:
 		     begin
+			sel = 3'b100;
+			next_state = ZERO;
+			end
+		default:
+			begin
 			sel = 3'b100;
 			next_state = ZERO;
 			end
