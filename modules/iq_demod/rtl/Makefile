@@ -1,7 +1,8 @@
 LIB = $(PROJECT_LIBS_DIR)/lib_iq_demod
 
-SVSRCS := ${IQ_DEMOD_DIR}/rtl/src/mux_20.sv \
-					${IQ_DEMOD_DIR}/rtl/src/mux2_20.sv \
+SVSRCS := ${IQ_DEMOD_DIR}/rtl/src/mux.sv \
+					${IQ_DEMOD_DIR}/rtl/src/adder.sv \
+					${IQ_DEMOD_DIR}/rtl/src/mult.sv \
 					${IQ_DEMOD_DIR}/rtl/src/gen_sin.sv \
 					${IQ_DEMOD_DIR}/rtl/src/shift_register_20.sv \
 					${IQ_DEMOD_DIR}/rtl/src/filter_signal_valid.sv \

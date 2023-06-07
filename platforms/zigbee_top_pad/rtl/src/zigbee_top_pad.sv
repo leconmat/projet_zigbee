@@ -19,8 +19,8 @@ module zigbee_top_pad(
     .sel_i(sel_w)
   );
 
-  ITP io_clk (.PAD(clk), .Y(clk_w));
-  ITP io_resetn (.PAD(resetn), .Y(resetn_w));
+  ITP io_CLK (.PAD(clk), .Y(clk_w));
+  ITP io_RESETN (.PAD(resetn), .Y(resetn_w));
 
   BU12SP io_sel_1 (.A(sel_w[1]), .PAD(sel[1]));
   BU12SP io_sel_0 (.A(sel_w[0]), .PAD(sel[0]));

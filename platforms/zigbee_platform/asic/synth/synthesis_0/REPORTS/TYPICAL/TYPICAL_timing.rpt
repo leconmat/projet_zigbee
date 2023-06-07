@@ -7,7 +7,7 @@ Report : timing
         -sort_by group
 Design : zigbee_platform
 Version: J-2014.09-SP2
-Date   : Tue Jun  6 09:42:38 2023
+Date   : Wed Jun  7 09:20:12 2023
 ****************************************
 
  # A fanout number of 1000 was used for high fanout net computations.
@@ -33,19 +33,19 @@ Wire Load Model Mode: enclosed
   i_iq_demod/filtre_I/data_1_1_reg[0]/C (DFC1)          0.0000 #   0.0000 r
   i_iq_demod/filtre_I/data_1_1_reg[0]/QN (DFC1)         0.9897     0.9897 r
   i_iq_demod/filtre_I/sum1_adder/U18/Q (NOR20)          0.3532     1.3429 f
-  U826/Q (XOR21)                                        0.7733     2.1162 f
+  U821/Q (XOR21)                                        0.7733     2.1162 f
   i_iq_demod/filtre_I/mult1_multiplier/U30/Q (NOR20)    0.5684     2.6845 r
   i_iq_demod/filtre_I/mult1_multiplier/genblk1[1].adder/U38/Q (XNR20)
                                                         0.7825     3.4670 f
   i_iq_demod/filtre_I/mult1_multiplier/genblk1[1].adder/U33/Q (OAI310)
                                                         0.5722     4.0392 r
-  U273/Q (IMAJ31)                                       0.2327     4.2718 f
+  U277/Q (IMAJ31)                                       0.2327     4.2718 f
   i_iq_demod/filtre_I/mult1_multiplier/genblk1[1].adder/U24/Q (OAI220)
                                                         0.5950     4.8668 r
-  U211/Q (IMAJ31)                                       0.2341     5.1009 f
+  U210/Q (IMAJ31)                                       0.2341     5.1009 f
   i_iq_demod/filtre_I/mult1_multiplier/genblk1[1].adder/U15/Q (OAI220)
                                                         0.5950     5.6959 r
-  U748/Q (XOR31)                                        0.9465     6.6423 r
+  U623/Q (XOR31)                                        0.9465     6.6423 r
   i_iq_demod/filtre_I/mult1_multiplier/genblk1[2].adder/U19/Q (XNR20)
                                                         0.6589     7.3012 f
   i_iq_demod/filtre_I/mult1_multiplier/genblk1[2].adder/U15/Q (OAI220)
@@ -56,21 +56,21 @@ Wire Load Model Mode: enclosed
                                                         0.6568     9.3537 f
   i_iq_demod/filtre_I/mult1_multiplier/genblk1[3].adder/U15/Q (OAI220)
                                                         0.5863     9.9400 r
-  U302/Q (XOR31)                                        0.9465    10.8864 r
+  U308/Q (XOR31)                                        0.9465    10.8864 r
   i_iq_demod/filtre_I/mult1_multiplier/genblk1[4].adder/U19/Q (XNR20)
                                                         0.6589    11.5453 f
   i_iq_demod/filtre_I/mult1_multiplier/genblk1[4].adder/U15/Q (OAI220)
                                                         0.5850    12.1303 r
-  U793/Q (XOR31)                                        0.9464    13.0768 r
+  U789/Q (XOR31)                                        0.9464    13.0768 r
   i_iq_demod/filtre_I/mult1_multiplier/genblk1[5].adder/U19/Q (XNR20)
                                                         0.6589    13.7356 f
   i_iq_demod/filtre_I/mult1_multiplier/genblk1[5].adder/U15/Q (OAI220)
                                                         0.5850    14.3206 r
-  U569/Q (XOR31)                                        0.9716    15.2922 r
-  U621/Q (XNR21)                                        0.4831    15.7753 f
+  U492/Q (XOR31)                                        0.9716    15.2922 r
+  U580/Q (XNR21)                                        0.4831    15.7753 f
   i_iq_demod/filtre_I/mult1_multiplier/genblk1[6].adder/U15/Q (OAI220)
                                                         0.5619    16.3372 r
-  U777/Q (XOR31)                                        0.9457    17.2829 r
+  U762/Q (XOR31)                                        0.9457    17.2829 r
   i_iq_demod/filtre_I/mult1_multiplier/genblk1[7].adder/U19/Q (XNR20)
                                                         0.6622    17.9451 r
   i_iq_demod/filtre_I/mult1_multiplier/genblk1[7].adder/U18/Q (XOR20)

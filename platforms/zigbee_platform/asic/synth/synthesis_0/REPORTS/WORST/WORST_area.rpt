@@ -3,7 +3,7 @@
 Report : area
 Design : zigbee_platform
 Version: J-2014.09-SP2
-Date   : Tue Jun  6 09:42:59 2023
+Date   : Wed Jun  7 09:20:31 2023
 ****************************************
 
 Library(s) Used:
@@ -11,20 +11,20 @@ Library(s) Used:
     c35_CORELIB_TYP (File: /softslin/AMS_410_ISR15/synopsys/c35_3.3V/c35_CORELIB_TYP.db)
 
 Number of ports:                           44
-Number of nets:                          5913
-Number of cells:                         5636
-Number of combinational cells:           4019
-Number of sequential cells:              1617
+Number of nets:                          5893
+Number of cells:                         5629
+Number of combinational cells:           4025
+Number of sequential cells:              1604
 Number of macros/black boxes:               0
-Number of buf/inv:                        777
-Number of references:                     107
+Number of buf/inv:                        794
+Number of references:                     110
 
-Combinational area:             435726.194504
-Buf/Inv area:                    32050.200928
-Noncombinational area:          548493.382629
+Combinational area:             440858.594505
+Buf/Inv area:                    33560.800919
+Noncombinational area:          543925.182556
 Macro/Black Box area:                0.000000
-Net Interconnect area:          158229.000000
+Net Interconnect area:          157878.000000
 
-Total cell area:                984219.577133
-Total area:                    1142448.577133
+Total cell area:                984783.777061
+Total area:                    1142661.777061
 1
