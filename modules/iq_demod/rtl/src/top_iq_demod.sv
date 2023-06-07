@@ -11,7 +11,8 @@ module top_iq_demod(
 
 logic signed [4:0] I_BB_IN, Q_BB_IN;
 logic signed [1:0] sine_IN, cosine_IN; 
-bit  filter_en, valid_out_I, valid_out_Q; // demod sort filter_en et le filter le reçoit en entrée, c'est les signaux de valid interne 
+bit  filter_en, valid_out_I, valid_out_Q; // demod sort filter_en et le filter le reçoit en entrée, c'est les signaux de valid interne
+
 demodulation demod(
 	.clk(clk),
 	.resetn(resetn),
