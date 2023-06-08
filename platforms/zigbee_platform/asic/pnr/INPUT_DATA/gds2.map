@@ -1,0 +1,30 @@
+##############################################################################
+#-----------------------------------------------------------------------------
+#
+# SOC Encounter GDSII Layer Map Table
+#
+#   Version: 30-Jan-2012
+##############################################################################
+# layer/object-type    layer/object-type    layer-number   data-type
+# =================    =================    ============   =========
+    MET1                 NET,SPNET,VIA,PIN    35            0
+    VIA1                 VIA                  36            0
+    MET2                 NET,SPNET,VIA,PIN    37            0
+    VIA2                 VIA                  38            0
+    MET3                 NET,SPNET,VIA,PIN    39            0
+    VIA3                 VIA                  41            0
+    MET4                 NET,SPNET,VIA,PIN    42            0
+    NAME                 PIN                  61            2
+    NAME                 MET1/PIN             61            2
+#   NAME                 MET1/NET             61            22
+#   NAME                 MET1/SPNET           61            22
+    NAME                 MET2/PIN             61            3
+#   NAME                 MET2/NET             61            23
+#   NAME                 MET2/SPNET           61            23
+    NAME                 MET3/PIN             61            4
+#   NAME                 MET3/NET             61            24
+#   NAME                 MET3/SPNET           61            24
+    NAME                 MET4/PIN             61            5
+#   NAME                 MET4/NET             61            25
+#   NAME                 MET4/SPNET           61            25
+#   NAME                 COMP               61            0
