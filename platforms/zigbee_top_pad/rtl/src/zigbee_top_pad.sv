@@ -3,7 +3,7 @@ module zigbee_top_pad(
   input wire resetn,
   input wire [1:0] sel,
   input wire [21:0] in,
-  input wire [17:0] out
+  output wire [17:0] out
 );
 
   wire clk_w, resetn_w;
