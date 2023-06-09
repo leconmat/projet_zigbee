@@ -47,4 +47,4 @@ addFiller -cell FILL25 FILL10 FILL5 FILL2 FILL1 -prefix FILLER
 # First route clock tree because critical path, after the design
 routeDesign
 
-#streamOut DB/zigbee_platform.gds -mapFile INPUT_DATA/gds2.map -libName DesignLib -units 1000 -mode ALL
+streamOut DB/zigbee_platform.gds -mapFile INPUT_DATA/gds2.map -libName DesignLib -units 1000 -mode ALL
