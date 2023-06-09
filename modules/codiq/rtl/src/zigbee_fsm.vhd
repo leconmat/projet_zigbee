@@ -185,11 +185,12 @@ begin
 			if(rising_edge(clk)) then
 				if(en_10MHz = '1' and en_10MHz_prev = '0') then
 					IBB    		<= temp_IBB;
-                	QBB    		<= temp_QBB;
-				end if;
-				if(c_state = rst_state) then
-					IBB <= (others => '0');
-					QBB <= (others => '0');
+          QBB    		<= temp_QBB;
+        else 
+          if(c_state = rst_state) then
+					  IBB <= (others => '0');
+					  QBB <= (others => '0');
+          end if;
 				end if;
 			end if;
 		end if;
@@ -316,7 +317,7 @@ begin
 		            if(cpt < x"4") then
 						S_AI_next	<= S_AI;
 						S_AQ_next	<= '1';
-						cpt_next	<= std_logic_vector(unsigned(cpt)+1);
+						cpt_next	<= cpt+ '1';
 
 		                S_QBB <= mem_array_Q(to_integer(unsigned(cpt)));
 					
@@ -365,14 +366,14 @@ begin
 				S_AQ_next		<= S_AQ;
 
 				if(f_dac_down = '1' and f_temp_dac = '1' and cpt /= x"0") then
-					cpt_next   	<= std_logic_vector(unsigned(cpt)-1);
+					cpt_next   	<= cpt - '1';
 				end if;
 
 				if(dac_ready = '1') then
 		            if(cpt > x"0") then
 						S_AI_next	<= S_AI;
 						S_AQ_next	<= S_AQ;
-						cpt_next   	<= std_logic_vector(unsigned(cpt)-1);
+						cpt_next   <= cpt - '1';
 
 		                if(S_AI = '0') then
 		                    S_IBB	<= std_logic_vector(-(signed(mem_array_I(to_integer(unsigned(cpt))))));
@@ -429,14 +430,14 @@ begin
 				S_AQ_next		<= S_AQ;
 
 				if(f_dac_down = '1' and f_temp_dac = '1' and cpt /= x"4") then
-					cpt_next   		<= std_logic_vector(unsigned(cpt)+1);
+					cpt_next   		<= cpt + '1';
 				end if;
 
 				if(dac_ready_prev = '1' and dac_ready = '1') then
 	            	if(cpt < x"4") then
 						S_AI_next	<= S_AI;
 						S_AQ_next	<= S_AQ;
-						cpt_next	<= std_logic_vector(unsigned(cpt)+1);
+						cpt_next	<= cpt + '1';
 
 	                	if(S_AI = '0') then
 	                	    S_IBB    <= std_logic_vector(-(signed(mem_array_I(to_integer(unsigned(cpt))))));

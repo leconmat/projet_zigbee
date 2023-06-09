@@ -7,7 +7,7 @@ VHDLSRCS := ${CODIQ_DIR}/rtl/src/en_gen.vhd \
 						${CODIQ_DIR}/rtl/src/TL_codeur_IQ.vhd
 
 VLOG_OPT += -incr -sv
-VCOM_OPT +=
+VCOM_OPT += -2008
 
 compile: lib
 	@echo "**[MAKE] Compiling RTL sources."
