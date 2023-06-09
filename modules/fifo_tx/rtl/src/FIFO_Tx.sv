@@ -142,9 +142,6 @@ always_comb begin
 			else
 				next_state_rd = Idle_Read;
 		end
-		default : begin
-			next_state_rd = Idle_Read;
-		end
 	endcase		
 end
 

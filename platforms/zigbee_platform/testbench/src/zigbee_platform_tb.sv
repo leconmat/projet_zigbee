@@ -17,15 +17,11 @@ logic [1:0] tb_sel_i = 2'b00;
     .mux_o(tb_mux_o),
     .sel_i(tb_sel_i)
   );
-// CDR TB signals
-logic signed [5:0] cdr_phase_i = 'b0;
-logic cdr_valid_i = 1;
+// CDR signals
+logic signed [5:0] cdr_phase_i;
+logic cdr_valid_i;
 logic cdr_data_o;
-logic output_wanted = 0;
-logic test = 1;
 logic cdr_valid_o;
-int variance = 0;
-int count = 0;
 
 // Fifo_tx
 logic [7:0] fifo_tx_pwdata_i;
@@ -40,11 +36,13 @@ logic       fifo_tx_enable_o;
 logic       fifo_tx_data_o;
 
 
+bit [7:0] sentData[$];
+
 // Mod_iq
 logic       mod_iq_data_i;
 logic       mod_iq_enable_i;
 logic       mod_iq_dac_ready_i = 1'b1;
-logic       mod_iq_mem_state_i;
+logic       mod_iq_mem_state_i = 1'b1;
 logic [3:0] mod_iq_ibb_o;
 logic [3:0] mod_iq_qbb_o;
 logic       mod_iq_enable_o;
@@ -52,29 +50,30 @@ logic       mod_iq_valid_o;
 
 
 // Demod_iq
-logic [4:0] demod_iq_iif_i;
-logic [4:0] demod_iq_qif_i;
+logic signed [4:0] demod_iq_iif_i;
+logic signed [4:0] demod_iq_qif_i;
 logic       demod_iq_valid_i;
-logic [4:0] demod_iq_ibb_o;
-logic [4:0] demod_iq_qbb_o;
+logic signed [4:0] demod_iq_ibb_o;
+logic signed [4:0] demod_iq_qbb_o;
 logic       demod_iq_valid_o;
 
+parameter real quantum = 0.03226;
+integer fd_I_in, fd_I_out, fd_Q_in, fd_Q_out;
+real matlab_in_I_real, matlab_in_Q_real;
+real matlab_out_I_real, matlab_out_Q_real;
+real filter_out_I_real, filter_out_Q_real;
+typedef logic signed [4:0] sample_t;
+sample_t matlab_out_I_digital, matlab_out_Q_digital;
 
 // Cordic
-logic [4:0] cordic_ibb_i;
-logic [4:0] cordic_qbb_i;
+logic signed [4:0] cordic_ibb_i;
+logic signed [4:0] cordic_qbb_i;
 logic       cordic_valid_i;
-logic [5:0] cordic_phase_o;
+logic signed [5:0] cordic_phase_o;
 logic       cordic_valid_o;
 
-real ibbReal, qbbReal, angleRad, angleDeg, deltaError, woutDeg;
-
-assign ibbReal = $cos(angleRad) * AMPLITUDE;
-assign qbbReal = $sin(angleRad) * AMPLITUDE;
-assign cordic_ibb_i = int'(ibbReal);
-assign cordic_qbb_i = int'(qbbReal);
-assign woutDeg = $itor(wout) * 5.625;
-
+bit newBit;
+bit bitstream_i[$];
 
 // Fifo_rx
 logic       fifo_rx_psel_i;
@@ -91,8 +90,9 @@ always begin
 end
 
 initial begin
+  tb_sel_i = 2'b10;
   #(`PERIOD*5) resetn = ~resetn;
-  cdr();
+  modiq_cordic_cdr();
 end
 
 logic fifo_pslverr;
@@ -114,7 +114,7 @@ always_comb begin
 
       fifo_rx_prdata_o = tb_mux_o[7:0];
       fifo_pslverr     = tb_mux_o[8];
-      mod_iq_enable_o  = tb_mux_o[9];
+      mod_iq_valid_o   = tb_mux_o[9];
       mod_iq_ibb_o     = tb_mux_o[13:10];
       mod_iq_qbb_o     = tb_mux_o[17:14];
     end
@@ -144,12 +144,13 @@ always_comb begin
       tb_mux_i[17]    = cdr_valid_i;
       tb_mux_i[18]    = mod_iq_data_i;
       tb_mux_i[19]    = mod_iq_enable_i;
+      tb_mux_i[20]    = mod_iq_mem_state_i;
 
       cordic_phase_o  = tb_mux_o[5:0];
       cordic_valid_o  = tb_mux_o[6];
       cdr_data_o      = tb_mux_o[7];
       cdr_valid_o     = tb_mux_o[8];
-      mod_iq_enable_o = tb_mux_o[9];
+      mod_iq_valid_o  = tb_mux_o[9];
       mod_iq_ibb_o    = tb_mux_o[13:10];
       mod_iq_qbb_o    = tb_mux_o[17:14];
     end
@@ -170,88 +171,157 @@ always_comb begin
   endcase
 end // End always_comb
 
+always_comb begin
+  if(tb_sel_i == 2'b01) begin
+    fifo_rx_data_i = fifo_tx_data_o;
+    fifo_rx_valid_i = fifo_tx_enable_o;
+  end
+  else if(tb_sel_i == 2'b10) begin
+    cdr_phase_i = cordic_phase_o;
+    cdr_valid_i = cordic_valid_o;
+    cordic_ibb_i = {mod_iq_ibb_o, 1'b0};
+    cordic_qbb_i = {mod_iq_qbb_o, 1'b0};
+    cordic_valid_i = mod_iq_valid_o;
+  end
+  else if(tb_sel_i == 2'b11) begin
+    cordic_ibb_i = demod_iq_ibb_o;
+    cordic_qbb_i = demod_iq_qbb_o;
+    cordic_valid_i = demod_iq_valid_o;
+ end
+end
 
-task cdr();
-  tb_sel_i = 2'b10;
+task tx_rx();
 
   fork
 
     begin
-      forever begin
-        #50 cdr_valid_i = ~cdr_valid_i;
+      fifo_tx_pwdata_i = 8'b00000000;	
+      fifo_psel = 1'b0;
+      fifo_pwrite = 1'b0;
+      fifo_pen = 1'b0;
+      #20;
+      fifo_pwrite = 1'b1;
+      fifo_pen = 1'b1;
+      for(integer i = 0 ; i < 10000 ; i++) begin
+        fifo_tx_pwdata_i = $urandom;
+        sentData.push_back(fifo_tx_pwdata_i);
+        #20;
       end
     end
 
     begin
-      forever begin
-        @(posedge cdr_valid_o);
-        if(output_wanted != cdr_data_o)
-          test = 0;
-      end
-    end
+      fd_I_in = $fopen("../data/I_in.csv", "r");
+      fd_I_out = $fopen("../data/I_out.csv", "r");
+      fd_Q_in = $fopen("../data/Q_in.csv", "r");	
+      fd_Q_out = $fopen("../data/Q_out.csv", "r");
+      
+      if(~fd_I_in) $display("I_in not opened");
+      if(~fd_I_out) $display("I_out not opened");
+      if(~fd_Q_in) $display("Q_in not opened");
+      if(~fd_Q_out) $display("Q_out not opened");
 
-    begin
-      $display("start");
-      #100
-      #33
-      for(int i = 0; i<100;i++) begin
-        output_wanted = $urandom(i)%2;
-        variance = 1 - $urandom(i)%3;
-        if(output_wanted == 0) begin
-          for(int j = 0; j <5 ; j++) begin
-            cdr_phase_i -=4+variance;
-            #100;
-          end
+      forever begin
+        $fscanf(fd_I_in, "%f\n", matlab_in_I_real);
+        $fscanf(fd_Q_in, "%f\n", matlab_in_Q_real);
+        
+        demod_iq_iif_i = sample_t'(matlab_in_I_real / quantum);
+        demod_iq_qif_i = sample_t'(matlab_in_Q_real / quantum);
+        
+        $fscanf(fd_I_out, "%f\n", matlab_out_I_real);
+        $fscanf(fd_Q_out, "%f\n", matlab_out_Q_real);
+        
+        matlab_out_I_digital = sample_t'((matlab_out_I_real*0.90) / quantum);
+        matlab_out_Q_digital = sample_t'((matlab_out_Q_real*0.90) / quantum);
+        
+        filter_out_I_real = (demod_iq_ibb_o * quantum);
+        filter_out_Q_real = (demod_iq_qbb_o * quantum);
+        
+        for(integer i  = 0; i < 5; i++) begin
+          if (i == 0) demod_iq_valid_i = 1;
+          else demod_iq_valid_i = 0;
+          @(posedge clk);
         end
-        else begin
-          for(int j = 0; j<5; j++) begin
-            cdr_phase_i += 4+variance;
-            #100;
-          end
-        end
-        if(test == 0)begin
-          $display("cdr_data_o != output_wanted at t = %t ",$realtime);
-          count = count + 1;
-        end
-        test = 1;
-      end
-      if(count != 0)
-      	$display("test failed");
-      else
-      	$display("test passed");
+      end 
     end
 
   join_any
+endtask
 
-endtask //end cdr
+task fifos();
 
-task cordic();
-  tb_sel_i = 2'b10;
+  fifo_tx_pwdata_i = 8'b00000000;	
+  fifo_psel = 1'b0;
+  fifo_pwrite = 1'b0;
+  fifo_pen = 1'b0;
+  #20;
+  fifo_pwrite = 1'b1;
+  fifo_pen = 1'b1;
+  for(integer i = 0 ; i < 10000 ; i++) begin
+    fifo_tx_pwdata_i = $urandom;
+    sentData.push_back(fifo_tx_pwdata_i);
+    #20;
+  end
 
-  fork
+endtask
+
+task modiq_cordic_cdr();
+
+  forever @(posedge clk) begin 
+    newBit = $urandom();
+    bitstream_i.push_back(newBit);
+    mod_iq_data_i = newBit;
+    mod_iq_enable_i = 1;
+
+    for(integer i = 0; i < 13; i++) begin
+      @(negedge clk);
+      @(posedge clk);
+    end
+
+    mod_iq_enable_i = 0;
+
+    for(integer k = 13; k < 24; k++) begin
+      @(negedge clk);
+      @(posedge clk);
+    end
+  end
+
+endtask
+
+task demodiq_cordic();
+
+  fd_I_in = $fopen("../data/I_in.csv", "r");
+  fd_I_out = $fopen("../data/I_out.csv", "r");
+  fd_Q_in = $fopen("../data/Q_in.csv", "r");	
+  fd_Q_out = $fopen("../data/Q_out.csv", "r");
+  
+  if(~fd_I_in) $display("I_in not opened");
+  if(~fd_I_out) $display("I_out not opened");
+  if(~fd_Q_in) $display("Q_in not opened");
+  if(~fd_Q_out) $display("Q_out not opened");
+
+  forever begin
+    $fscanf(fd_I_in, "%f\n", matlab_in_I_real);
+    $fscanf(fd_Q_in, "%f\n", matlab_in_Q_real);
     
-    begin
-      forever begin
-        deltaError = woutDeg - angleDeg;
-        if(deltaError > 180)
-          deltaError -= 360;
-        if(deltaError <= -180)
-          deltaError += 360;
-      end
+    demod_iq_iif_i = sample_t'(matlab_in_I_real / quantum);
+    demod_iq_qif_i = sample_t'(matlab_in_Q_real / quantum);
+    
+    $fscanf(fd_I_out, "%f\n", matlab_out_I_real);
+    $fscanf(fd_Q_out, "%f\n", matlab_out_Q_real);
+    
+    matlab_out_I_digital = sample_t'((matlab_out_I_real*0.90) / quantum);
+    matlab_out_Q_digital = sample_t'((matlab_out_Q_real*0.90) / quantum);
+    
+    filter_out_I_real = (demod_iq_ibb_o * quantum);
+    filter_out_Q_real = (demod_iq_qbb_o * quantum);
+    
+    for(integer i  = 0; i < 5; i++) begin
+      if (i == 0) demod_iq_valid_i = 1;
+      else demod_iq_valid_i = 0;
+      @(posedge clk);
     end
+  end
 
-    begin
-      forever begin
-        angleRad = $itor($urandom_range(2 * PI * 10000)) / 10000;
-        angleDeg = (angleRad * 360) / (2 * PI);
-        iValid <= 1;
-        #200ns;
-        
-        if((deltaError > 0 ? deltaError : -deltaError) > maxError)
-          maxError = deltaError > 0 ? deltaError : -deltaError;
-      end
-    end
-
-endtask //end cordic
+endtask
 
 endmodule

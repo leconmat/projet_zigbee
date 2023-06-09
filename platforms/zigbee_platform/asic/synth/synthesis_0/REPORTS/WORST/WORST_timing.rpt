@@ -7,7 +7,7 @@ Report : timing
         -sort_by group
 Design : zigbee_platform
 Version: J-2014.09-SP2
-Date   : Wed Jun  7 09:20:32 2023
+Date   : Fri Jun  9 16:03:35 2023
 ****************************************
 
  # A fanout number of 1000 was used for high fanout net computations.
@@ -15,9 +15,9 @@ Date   : Wed Jun  7 09:20:32 2023
 Operating Conditions: WORST   Library: c35_CORELIB_TYP
 Wire Load Model Mode: enclosed
 
-  Startpoint: i_iq_demod/filtre_I/data_1_1_reg[1]
+  Startpoint: i_iq_demod/filtre_Q/data_1_2_reg[0]
               (rising edge-triggered flip-flop clocked by clk)
-  Endpoint: i_iq_demod/filtre_I/mult1_multiplier/register_pipe_reg[9][4]
+  Endpoint: i_iq_demod/filtre_Q/mult2_multiplier/register_pipe_reg[9][3]
             (rising edge-triggered flip-flop clocked by clk)
   Path Group: clk
   Path Type: max
@@ -30,58 +30,61 @@ Wire Load Model Mode: enclosed
   --------------------------------------------------------------------------
   clock clk (rise edge)                                 0.0000     0.0000
   clock network delay (ideal)                           0.0000     0.0000
-  i_iq_demod/filtre_I/data_1_1_reg[1]/C (DFC3)          0.0000 #   0.0000 r
-  i_iq_demod/filtre_I/data_1_1_reg[1]/Q (DFC3)          1.1989     1.1989 f
-  U1717/Q (CLKIN6)                                      0.2004     1.3993 r
-  U1715/Q (NAND26)                                      0.1090     1.5083 f
-  U1455/Q (NAND28)                                      0.3389     1.8472 r
-  U1710/Q (XOR22)                                       0.5742     2.4214 r
-  U1778/Q (NOR24)                                       0.1757     2.5971 f
-  U1854/Q (XNR22)                                       0.5932     3.1903 f
-  U817/Q (CLKIN6)                                       0.2750     3.4653 r
-  U1873/Q (OAI312)                                      0.1874     3.6527 f
-  U277/Q (IMAJ31)                                       0.5481     4.2008 r
-  U1907/Q (OAI222)                                      0.2515     4.4523 f
-  U1825/Q (IMAJ31)                                      0.7696     5.2219 r
-  U1388/Q (XNR21)                                       1.1737     6.3956 f
-  U437/Q (BUF2)                                         0.6912     7.0869 f
-  U1391/Q (XOR31)                                       0.5924     7.6793 f
-  U617/Q (MUX24)                                        0.5295     8.2088 f
-  U1481/Q (CLKIN2)                                      0.3170     8.5257 r
-  U1508/Q (XNR22)                                       0.6474     9.1731 f
-  U1721/Q (XOR22)                                       0.5755     9.7486 r
-  U1720/Q (XOR22)                                       0.6440    10.3927 f
-  U1737/Q (XOR22)                                       0.5572    10.9498 f
-  U1779/Q (OAI312)                                      0.5210    11.4708 r
-  U1451/Q (MAJ31)                                       0.7388    12.2096 r
-  U1450/Q (XNR22)                                       0.7641    12.9738 f
-  U1628/Q (XNR21)                                       0.6592    13.6329 r
-  U1893/Q (XNR22)                                       0.7702    14.4031 f
-  U1735/Q (XNR22)                                       0.6365    15.0397 f
-  U1734/Q (OAI312)                                      0.6078    15.6475 r
-  U822/Q (XOR31)                                        0.8164    16.4639 f
-  U1567/Q (BUF6)                                        0.4723    16.9363 f
-  U1744/Q (XNR22)                                       0.5475    17.4838 f
-  U1748/Q (OAI312)                                      0.4655    17.9493 r
-  U393/Q (IMAJ31)                                       0.4150    18.3643 f
-  U875/Q (OAI222)                                       0.6625    19.0268 r
-  U1861/Q (MAJ32)                                       0.4382    19.4650 r
-  U1810/Q (XOR31)                                       0.5320    19.9970 f
-  i_iq_demod/filtre_I/mult1_multiplier/register_pipe_reg[9][4]/D (DFC1)
-                                                        0.0001    19.9971 f
-  data arrival time                                               19.9971
+  i_iq_demod/filtre_Q/data_1_2_reg[0]/C (DFC3)          0.0000 #   0.0000 r
+  i_iq_demod/filtre_Q/data_1_2_reg[0]/QN (DFC3)         1.6209     1.6209 r
+  U8492/Q (XNR21)                                       0.7263     2.3472 f
+  U8493/Q (NAND22)                                      0.4364     2.7836 r
+  U8495/Q (OAI212)                                      0.2396     3.0232 f
+  U6480/Q (INV3)                                        0.3498     3.3731 r
+  U6469/Q (XNR31)                                       1.1901     4.5632 r
+  U6383/Q (BUF6)                                        0.4416     5.0047 r
+  U6692/Q (XOR22)                                       0.5920     5.5967 r
+  U8007/Q (XNR21)                                       0.8450     6.4417 f
+  U8538/Q (NAND22)                                      0.4601     6.9018 r
+  U8541/Q (OAI222)                                      0.3503     7.2521 f
+  U6302/Q (INV6)                                        0.3086     7.5607 r
+  U6316/Q (OAI212)                                      0.1748     7.7355 f
+  U8542/Q (OAI212)                                      0.5300     8.2655 r
+  U6350/Q (INV3)                                        0.2365     8.5020 f
+  U5886/Q (NAND21)                                      0.5037     9.0057 r
+  U8929/Q (AOI312)                                      0.2606     9.2664 f
+  U6944/Q (XOR22)                                       0.7212     9.9876 f
+  U5840/Q (NAND23)                                      0.3164    10.3039 r
+  U8930/Q (OAI212)                                      0.2777    10.5817 f
+  U6314/Q (CLKIN6)                                      0.3140    10.8957 r
+  U6313/Q (XNR22)                                       0.5466    11.4423 f
+  U5859/Q (CLKIN3)                                      0.2698    11.7121 r
+  U7979/Q (XNR31)                                       1.4342    13.1463 r
+  U8959/Q (OAI222)                                      0.3681    13.5143 f
+  U5805/Q (INV4)                                        0.3695    13.8838 r
+  U8965/Q (OAI212)                                      0.1754    14.0592 f
+  U8966/Q (OAI212)                                      0.5396    14.5987 r
+  U8976/Q (OAI222)                                      0.2290    14.8277 f
+  U5909/Q (CLKIN6)                                      0.4340    15.2617 r
+  U8997/Q (XOR31)                                       1.3143    16.5760 r
+  U8998/Q (OAI222)                                      0.1874    16.7633 f
+  U5817/Q (CLKIN6)                                      0.3009    17.0642 r
+  U5818/Q (INV10)                                       0.1513    17.2155 f
+  U5863/Q (INV3)                                        0.1874    17.4030 r
+  U9026/Q (XOR31)                                       1.1367    18.5397 r
+  U9027/Q (OAI222)                                      0.1533    18.6930 f
+  U6444/Q (INV3)                                        0.4011    19.0941 r
+  U8100/Q (XNR20)                                       0.9028    19.9969 f
+  i_iq_demod/filtre_Q/mult2_multiplier/register_pipe_reg[9][3]/D (DFC3)
+                                                        0.0001    19.9970 f
+  data arrival time                                               19.9970
 
   clock clk (rise edge)                                20.0000    20.0000
   clock network delay (ideal)                           0.0000    20.0000
-  i_iq_demod/filtre_I/mult1_multiplier/register_pipe_reg[9][4]/C (DFC1)
+  i_iq_demod/filtre_Q/mult2_multiplier/register_pipe_reg[9][3]/C (DFC3)
                                                         0.0000    20.0000 r
   library setup time                                   -0.0012    19.9988
   data required time                                              19.9988
   --------------------------------------------------------------------------
   data required time                                              19.9988
-  data arrival time                                              -19.9971
+  data arrival time                                              -19.9970
   --------------------------------------------------------------------------
-  slack (MET)                                                      0.0017
+  slack (MET)                                                      0.0018
 
 
 1
