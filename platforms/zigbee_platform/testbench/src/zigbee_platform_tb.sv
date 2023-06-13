@@ -1,5 +1,5 @@
-`timescale 1 ns/10 ps
-`define PERIOD 20
+`timescale 1ps/100fs
+`define PERIOD 20ns
 
 module zigbee_platform_tb();
 
@@ -10,13 +10,17 @@ logic [21:0] tb_mux_i;
 logic [17:0] tb_mux_o;
 logic [1:0] tb_sel_i = 2'b00;
 
-  zigbee_platform dut(
-    .clk_i(clk),
-    .resetn_i(resetn),
-    .mux_i(tb_mux_i),
-    .mux_o(tb_mux_o),
-    .sel_i(tb_sel_i)
+  zigbee_top_pad dut(
+    .clk(clk),
+    .resetn(resetn),
+    .in(tb_mux_i),
+    .out(tb_mux_o),
+    .sel(tb_sel_i)
   );
+initial begin
+  //$sdf_annotate("~/projet_zigbee/platforms/zigbee_platform/asic/pnr/zigbee_top_pad_pnr.sdf", zigbee_platform_tb.dut, , , "maximum");
+end
+
 // CDR signals
 logic signed [5:0] cdr_phase_i;
 logic cdr_valid_i;
@@ -90,9 +94,9 @@ always begin
 end
 
 initial begin
-  tb_sel_i = 2'b10;
+  tb_sel_i = 2'b11;
   #(`PERIOD*5) resetn = ~resetn;
-  modiq_cordic_cdr();
+  demodiq_cordic();
 end
 
 logic fifo_pslverr;
@@ -102,6 +106,7 @@ logic fifo_pwrite;
 logic fifo_pready;
 
 always_comb begin
+  tb_mux_i = 'b0;
   unique case(tb_sel_i)
     2'b00: begin // Tx/Rx chains
       tb_mux_i[0]     = fifo_psel;
