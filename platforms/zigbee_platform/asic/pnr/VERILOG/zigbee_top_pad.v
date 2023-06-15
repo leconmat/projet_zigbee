@@ -11,7 +11,7 @@ module zigbee_top_pad(
   wire [21:0] in_w;
   wire [17:0] out_w;
 
-  zigbee_platform(
+  zigbee_platform ZIGBEE_TOP(
     .clk_i(clk_w),
     .resetn_i(resetn_w),
     .mux_i(in_w),

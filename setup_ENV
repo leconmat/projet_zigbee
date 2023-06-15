@@ -8,7 +8,7 @@ source /softslin/configCAO/Synopsys/config_DesignVision
 
 source /softslin/configCAO/Cadence/licence_cadence
 source /softslin/configCAO/Cadence/config_Virtuoso
-source /softslin/configCAO/Cadence/config_Innovus_17
+source /softslin/configCAO/Cadence/config_Innovus_19
 source /softslin/configCAO/Cadence/config_QRC
 
 source /softslin/configCAO/MentorGraphics/config_Calibre
@@ -24,4 +24,4 @@ source /softslin/configCAO/Atrenta/licence_atrenta
 
 export MODELSIM="${PROJECT_DIR}/config/modelsim.ini"
 
-source config/setup_ENV.design
+#source config/setup_ENV.design
