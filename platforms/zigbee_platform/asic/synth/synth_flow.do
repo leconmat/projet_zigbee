@@ -41,7 +41,7 @@ set corners {BEST TYPICAL WORST}
 foreach corner $corners {
 	puts "The actual corner is ${corner}"
 	set_operating_conditions -library c35_CORELIB_TYP $corner
-	compile -exact_map -map_effort $vars(map_effort) -area_effort $vars(area_effort) -power_effort $vars(power_effort) -incremental_mapping -ungroup_al
+	compile -map_effort $vars(map_effort) -area_effort $vars(area_effort) -power_effort $vars(power_effort) -ungroup_all
   
 	set rptDir "REPORTS/${corner}"
 	file mkdir ${rptDir}

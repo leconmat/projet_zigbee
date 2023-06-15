@@ -1,6 +1,6 @@
 LIB = $(PROJECT_LIBS_DIR)/lib_zigbee_platform
 
-SVSRCS := ${ZIGBEE_PLATFORM_DIR}/rtl/src/zigbee_platform.sv
+SVSRCS := ${ZIGBEE_PLATFORM_DIR}/asic/pnr/zigbee_top_pad_pnr.v
 
 VHDLSRCS :=
 

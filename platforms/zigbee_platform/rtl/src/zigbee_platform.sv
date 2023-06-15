@@ -50,7 +50,6 @@ module zigbee_platform(
   logic       mod_iq_valid_o;
 
   assign mod_iq_dac_ready_i = 1'b1;
-  assign mod_iq_mem_state_i = fifo_tx_mem_state_o;
   assign fifo_tx_enable_i = mod_iq_enable_o;
 
   TL_codeur_IQ i_mod_iq(
@@ -180,6 +179,7 @@ module zigbee_platform(
 
     mod_iq_data_i = fifo_tx_data_o;
     mod_iq_enable_i = fifo_tx_enable_o;
+    mod_iq_mem_state_i = fifo_tx_mem_state_o;
 
     demod_iq_iif_i = 'b0;
     demod_iq_qif_i = 'b0;
@@ -237,6 +237,7 @@ module zigbee_platform(
         cdr_valid_i        = mux_i[17];
         mod_iq_data_i      = mux_i[18];
         mod_iq_enable_i    = mux_i[19];
+        mod_iq_mem_state_i = mux_i[20];
 
         mux_o[5:0]   = cordic_phase_o;
         mux_o[6]     = cordic_valid_o;
