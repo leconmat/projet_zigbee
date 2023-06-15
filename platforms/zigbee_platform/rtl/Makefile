@@ -1,10 +1,10 @@
 LIB = $(PROJECT_LIBS_DIR)/lib_zigbee_platform
 
-SVSRCS := ${ZIGBEE_PLATFORM_DIR}/asic/pnr/zigbee_top_pad_pnr.v
+SVSRCS := ${ZIGBEE_PLATFORM_DIR}/asic/pnr/zigbee_top_pad.v
 
 VHDLSRCS :=
 
-VLOG_OPT += -incr -sv
+VLOG_OPT += +acc -incr -sv
 VCOM_OPT +=
 
 compile: lib

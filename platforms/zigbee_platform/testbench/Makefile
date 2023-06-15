@@ -4,10 +4,10 @@ SVSRCS := ${ZIGBEE_PLATFORM_DIR}/testbench/src/zigbee_platform_tb.sv
 
 VHDLSRCS :=
 
-VLOG_OPT += -incr -sv
+VLOG_OPT += +acc -incr -sv
 VCOM_OPT +=
 
-VSIM_OPT +=-voptargs=-O4 \
+VSIM_OPT +=-voptargs=-O0 \
 						-L $(PROJECT_LIBS_DIR)/lib_CDR \
 						-L $(PROJECT_LIBS_DIR)/lib_cordic \
 						-L $(PROJECT_LIBS_DIR)/lib_codiq \

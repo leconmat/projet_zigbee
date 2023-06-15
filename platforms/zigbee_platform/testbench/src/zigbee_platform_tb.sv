@@ -3,23 +3,21 @@
 
 module zigbee_platform_tb();
 
-logic clk = 1;
-logic resetn = 0;
+logic tb_clk = 1;
+logic tb_resetn = 0;
 
 logic [21:0] tb_mux_i;
 logic [17:0] tb_mux_o;
 logic [1:0] tb_sel_i = 2'b00;
 
   zigbee_top_pad dut(
-    .clk(clk),
-    .resetn(resetn),
+    .clk(tb_clk),
+    .resetn(tb_resetn),
     .in(tb_mux_i),
     .out(tb_mux_o),
     .sel(tb_sel_i)
   );
-initial begin
-  //$sdf_annotate("~/projet_zigbee/platforms/zigbee_platform/asic/pnr/zigbee_top_pad_pnr.sdf", zigbee_platform_tb.dut, , , "maximum");
-end
+
 
 // CDR signals
 logic signed [5:0] cdr_phase_i;
@@ -90,13 +88,13 @@ logic       fifo_rx_pslv_err_o;
 logic       fifo_rx_pready_o;
 
 always begin
-  #(`PERIOD/2) clk = ~clk;
+  #(`PERIOD/2) tb_clk = ~tb_clk;
 end
 
 initial begin
-  tb_sel_i = 2'b11;
-  #(`PERIOD*5) resetn = ~resetn;
-  demodiq_cordic();
+  tb_sel_i = 2'b10;
+  #(`PERIOD*5) tb_resetn = ~tb_resetn;
+  modiq_cordic_cdr();
 end
 
 logic fifo_pslverr;
@@ -204,13 +202,13 @@ task tx_rx();
       fifo_psel = 1'b0;
       fifo_pwrite = 1'b0;
       fifo_pen = 1'b0;
-      #20;
+      #20ns;
       fifo_pwrite = 1'b1;
       fifo_pen = 1'b1;
       for(integer i = 0 ; i < 10000 ; i++) begin
         fifo_tx_pwdata_i = $urandom;
         sentData.push_back(fifo_tx_pwdata_i);
-        #20;
+        #20ns;
       end
     end
 
@@ -244,7 +242,7 @@ task tx_rx();
         for(integer i  = 0; i < 5; i++) begin
           if (i == 0) demod_iq_valid_i = 1;
           else demod_iq_valid_i = 0;
-          @(posedge clk);
+          @(posedge tb_clk);
         end
       end 
     end
@@ -258,35 +256,35 @@ task fifos();
   fifo_psel = 1'b0;
   fifo_pwrite = 1'b0;
   fifo_pen = 1'b0;
-  #20;
+  #20ns;
   fifo_pwrite = 1'b1;
   fifo_pen = 1'b1;
   for(integer i = 0 ; i < 10000 ; i++) begin
     fifo_tx_pwdata_i = $urandom;
     sentData.push_back(fifo_tx_pwdata_i);
-    #20;
+    #20ns;
   end
 
 endtask
 
 task modiq_cordic_cdr();
 
-  forever @(posedge clk) begin 
+  forever @(posedge tb_clk) begin 
     newBit = $urandom();
     bitstream_i.push_back(newBit);
     mod_iq_data_i = newBit;
     mod_iq_enable_i = 1;
 
     for(integer i = 0; i < 13; i++) begin
-      @(negedge clk);
-      @(posedge clk);
+      @(negedge tb_clk);
+      @(posedge tb_clk);
     end
 
     mod_iq_enable_i = 0;
 
     for(integer k = 13; k < 24; k++) begin
-      @(negedge clk);
-      @(posedge clk);
+      @(negedge tb_clk);
+      @(posedge tb_clk);
     end
   end
 
@@ -323,7 +321,7 @@ task demodiq_cordic();
     for(integer i  = 0; i < 5; i++) begin
       if (i == 0) demod_iq_valid_i = 1;
       else demod_iq_valid_i = 0;
-      @(posedge clk);
+      @(posedge tb_clk);
     end
   end
 
