@@ -9,7 +9,7 @@
 source "./SCRIPTS/init.tcl"
 
 # Define the floorplan (size of the chip and margin between core and IOs)
-floorPlan -noSnapToGrid -site standard -d 2010.8 2010.8 55.0 55.0 55.0 55.0
+floorPlan -noSnapToGrid -site standard -d 1958.8 1958.8 55.0 55.0 55.0 55.0
 
 addIoFiller -cell {PERI_SPACER_5_P PERI_SPACER_50_P PERI_SPACER_2_P PERI_SPACER_20_P PERI_SPACER_1_P PERI_SPACER_10_P PERI_SPACER_100_P PERI_SPACER_01_P} -prefix PADFILLER 
 
@@ -47,4 +47,4 @@ addFiller -cell FILL25 FILL10 FILL5 FILL2 FILL1 -prefix FILLER
 # First route clock tree because critical path, after the design
 routeDesign
 
-#streamOut DB/zigbee_platform.gds -mapFile INPUT_DATA/gds2.map -libName DesignLib -units 1000 -mode ALL
+streamOut DB/zigbee_platform.gds -mapFile INPUT_DATA/gds2.map -libName DesignLib -units 1000 -mode ALL

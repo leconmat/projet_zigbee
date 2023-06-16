@@ -33,7 +33,7 @@ logic empty;
 logic wr_en;
 logic rd_en;
 reg [7:0] shift_register;
-reg [WIDTH-1:0] i;
+logic [2:0] i;
 reg en_cdr_prec;
 
 assign pready = 1'b1;
@@ -56,14 +56,7 @@ always_comb begin
 end
 
 // APB Error logic
-always_comb begin
-	if (empty == 1) begin 
-		pslverr = 1'b1; // Memoire pleine 
-	end
-	else 
-		pslverr = 1'b0;
-end
-
+assign pslverr = empty;
 /////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////// END MEMORY LOGIC //////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -74,21 +67,25 @@ end
 ///////////////////////////////// BEGIN WRITE LOGIC /////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////
 
-assign wr_en = !en_cdr_prec && en_cdr && !full ;
+assign wr_en = ~en_cdr_prec && en_cdr && (i == 0);
 
 // Shift register SERIAL IN PARALLEL OUT 
 always @(posedge clk, negedge reset_n) begin
-	if (!reset_n) begin
-		shift_register <= 8'b00000000;
+	if (~reset_n) begin
+		shift_register <= 'b0;
+    en_cdr_prec <= 'b0;
 		i <=0;
 	end
 	else begin
-		if (i >= WIDTH)
-			i <= 0;
-		else begin
-			shift_register[i] <= data_in;
-			i <= i + 1;
-		end
+    en_cdr_prec <= en_cdr;
+    if(~en_cdr_prec && en_cdr) begin
+      shift_register <= {data_in, shift_register[7:1]};
+      i <= i + 1;
+    end
+    else begin
+      shift_register <= shift_register;
+      i <= i;
+    end
 	end
 end
 
@@ -100,14 +97,13 @@ always_ff @(posedge clk, negedge reset_n) begin
 		wr_ptr <= 0;
 	end
 	else begin
-		en_cdr_prec <= en_cdr;	
-		if(!en_cdr_prec && en_cdr && !full) begin
-			mem[wr_ptr[PTR_WIDTH-1:0]] <= shift_register;
-			wr_ptr <= wr_ptr + 1;
+		if(wr_en) begin
+      mem[wr_ptr[PTR_WIDTH-1:0]] <= shift_register;
+      wr_ptr <= wr_ptr + 1;
 		end
 		else begin
-			mem[wr_ptr[PTR_WIDTH-1:0]] <= mem[wr_ptr[PTR_WIDTH-1:0]];
-			
+      wr_ptr <= wr_ptr;
+      mem[wr_ptr[PTR_WIDTH-1:0]] <= mem[wr_ptr[PTR_WIDTH-1:0]];
 		end
 	end
 end
@@ -123,23 +119,27 @@ end
 
 assign rd_en = psel && penable && !pwrite && !empty;
 
-always_ff @(posedge clk) begin
-	if(rd_en)
-		prdata <= mem[rd_ptr[PTR_WIDTH-1:0]];
-	else
-		prdata <= 'h0;
+always_ff @(posedge clk, negedge reset_n) begin
+  if(~reset_n)
+    prdata <= 'b0;
+  else begin
+    if(rd_en)
+	  	prdata <= mem[rd_ptr[PTR_WIDTH-1:0]];
+	  else
+	  	prdata <= 'b0;
+  end
 end	
 
 always_ff @(posedge clk, negedge reset_n) begin
 	if(~reset_n) begin
-		rd_ptr <= 'h0;
+		rd_ptr <= 'b0;
 	end
 	else begin
-		if (rd_en) 
+		if (rd_en || (full && wr_en)) 
 			rd_ptr <= rd_ptr + 1;
 		else
-			rd_ptr <= rd_ptr;
-	end
+      rd_ptr <= rd_ptr;
+  end
 end
 ////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////// END READ LOGIC ///////////////////////////////////////

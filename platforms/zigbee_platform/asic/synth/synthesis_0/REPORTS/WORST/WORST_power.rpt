@@ -8,7 +8,7 @@ Report : power
         -analysis_effort high
 Design : zigbee_platform
 Version: J-2014.09-SP2
-Date   : Wed Jun  7 09:20:32 2023
+Date   : Fri Jun  9 16:03:35 2023
 ****************************************
 
 
@@ -34,12 +34,12 @@ Power-specific unit information :
     Leakage Power Units = 1pW
 
 
-  Cell Internal Power  =  27.5175 mW   (94%)
-  Net Switching Power  =   1.7538 mW    (6%)
+  Cell Internal Power  =  27.7901 mW   (92%)
+  Net Switching Power  =   2.3784 mW    (8%)
                          ---------
-Total Dynamic Power    =  29.2713 mW  (100%)
+Total Dynamic Power    =  30.1685 mW  (100%)
 
-Cell Leakage Power     =   7.8416 nW
+Cell Leakage Power     =   8.0944 nW
 
 
                  Internal         Switching           Leakage            Total
@@ -49,9 +49,9 @@ io_pad             0.0000            0.0000            0.0000            0.0000 
 memory             0.0000            0.0000            0.0000            0.0000  (   0.00%)
 black_box          0.0000            0.0000            0.0000            0.0000  (   0.00%)
 clock_network      0.0000            0.0000            0.0000            0.0000  (   0.00%)
-register          26.2919            0.6001        4.5403e+03           26.8920  (  91.87%)
-sequential     6.9607e-03        7.7981e-04           11.4816        7.7405e-03  (   0.03%)
-combinational      1.2188            1.1529        3.2898e+03            2.3717  (   8.10%)
+register          26.5233            0.6820        4.5807e+03           27.2053  (  90.18%)
+sequential     6.7308e-03        6.0354e-04           12.7772        7.3343e-03  (   0.02%)
+combinational      1.2601            1.6958        3.5009e+03            2.9559  (   9.80%)
 --------------------------------------------------------------------------------------------------
-Total             27.5176 mW         1.7538 mW     7.8416e+03 pW        29.2714 mW
+Total             27.7901 mW         2.3784 mW     8.0944e+03 pW        30.1685 mW
 1

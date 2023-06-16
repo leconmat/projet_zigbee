@@ -7,7 +7,7 @@ VHDLSRCS :=
 VLOG_OPT += -incr -sv
 VCOM_OPT +=
 
-VSIM_OPT += -voptargs=+acc \
+VSIM_OPT +=-voptargs=-O4 \
 						-L $(PROJECT_LIBS_DIR)/lib_CDR \
 						-L $(PROJECT_LIBS_DIR)/lib_cordic \
 						-L $(PROJECT_LIBS_DIR)/lib_codiq \
@@ -15,7 +15,8 @@ VSIM_OPT += -voptargs=+acc \
 						-L $(PROJECT_LIBS_DIR)/lib_fifo_rx \
 						-L $(PROJECT_LIBS_DIR)/lib_iq_demod \
 						-L $(PROJECT_LIBS_DIR)/lib_zigbee_platform \
-						-t 1ns
+						-L ${AMS_DIR}/verilog/c35b4/lib_Questa107c/c35_CORELIB \
+						-L ${AMS_DIR}/verilog/c35b4/lib_Questa107c/c35_IOLIB
 
 LIST_UNITS := ${CDR_DIR} \
 							${CORDIC_DIR} \
