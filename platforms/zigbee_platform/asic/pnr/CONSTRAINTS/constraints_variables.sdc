@@ -1,5 +1,5 @@
 set clk_root(clk)               "clk"
-set clk_period(clk)            50.000
+set clk_period(clk)            20.000
 
 set clock_uncertainty(setup) 5.0
 set clock_uncertainty(hold) 2.5

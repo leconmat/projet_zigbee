@@ -24,3 +24,8 @@ set cts_cell_list [list CLKIN0 CLKIN1 CLKIN2 CLKIN3 CLKIN4 CLKIN6 CLKIN8 CLKIN10
 
 init_design
 loadIoFile "./INPUT_DATA/zigbee_top_pad.io"
+
+# Define the floorplan (size of the chip and margin between core and IOs)
+floorPlan -noSnapToGrid -site standard -d 1958.8 1958.8 55.0 55.0 55.0 55.0
+
+addIoFiller -cell {PERI_SPACER_5_P PERI_SPACER_50_P PERI_SPACER_2_P PERI_SPACER_20_P PERI_SPACER_1_P PERI_SPACER_10_P PERI_SPACER_100_P PERI_SPACER_01_P} -prefix PADFILLER 
